@@ -39,14 +39,13 @@ export default function ChatBot() {
   }, [isOpen, conversation]);
 
   const initializeChat = async () => {
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       const user = await base44.auth.me();
       
       if (!user) {
         toast.error("Please login to use the chat assistant");
         setIsOpen(false);
-        setIsLoading(false);
         return;
       }
 
@@ -59,8 +58,6 @@ export default function ChatBot() {
         }
       });
 
-      console.log("Conversation created:", newConversation);
-
       setConversation(newConversation);
       setMessages(newConversation.messages || []);
 
@@ -69,16 +66,16 @@ export default function ChatBot() {
         newConversation.id,
         (data) => {
           setMessages(data.messages);
+          setIsSending(false);
         }
       );
-
-      setIsLoading(false);
       
       // Return cleanup function
       return unsubscribe;
     } catch (error) {
       console.error("Error initializing chat:", error);
-      toast.error("Failed to initialize chat");
+      toast.error(error.message || "Failed to initialize chat. Please try again.");
+    } finally {
       setIsLoading(false);
     }
   };
