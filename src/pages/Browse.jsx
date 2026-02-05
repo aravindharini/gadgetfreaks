@@ -225,23 +225,25 @@ export default function Browse() {
         </div>
       )}
 
-      {/* Condition */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Condition</label>
-        <Select value={selectedCondition} onValueChange={setSelectedCondition}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Conditions</SelectItem>
-            <SelectItem value="mint">Mint</SelectItem>
-            <SelectItem value="excellent">Excellent</SelectItem>
-            <SelectItem value="good">Good</SelectItem>
-            <SelectItem value="fair">Fair</SelectItem>
-            <SelectItem value="poor">Poor</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Condition (hidden for services) */}
+      {selectedCategory !== "services" && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Condition</label>
+          <Select value={selectedCondition} onValueChange={setSelectedCondition}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Conditions</SelectItem>
+              <SelectItem value="mint">Mint</SelectItem>
+              <SelectItem value="excellent">Excellent</SelectItem>
+              <SelectItem value="good">Good</SelectItem>
+              <SelectItem value="fair">Fair</SelectItem>
+              <SelectItem value="poor">Poor</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       {/* Price Range */}
       <div>

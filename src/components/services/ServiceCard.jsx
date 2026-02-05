@@ -4,7 +4,7 @@ import { createPageUrl } from "@/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, MapPin, Clock, Navigation } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Navigation, Globe } from "lucide-react";
 
 export default function ServiceCard({ listing }) {
   const primaryImage = listing.images?.[0] || "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400&h=300&fit=crop";
@@ -86,6 +86,20 @@ export default function ServiceCard({ listing }) {
             <div className="flex items-start gap-2 text-sm">
               <Clock className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
               <span className="text-gray-700">{listing.operating_hours}</span>
+            </div>
+          )}
+
+          {listing.website && (
+            <div className="flex items-start gap-2 text-sm">
+              <Globe className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+              <a 
+                href={listing.website} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline line-clamp-1"
+              >
+                {listing.website.replace(/^https?:\/\//, '')}
+              </a>
             </div>
           )}
         </div>
