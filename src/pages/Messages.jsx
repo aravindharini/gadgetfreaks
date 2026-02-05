@@ -111,6 +111,16 @@ export default function Messages() {
         content: newMessage.trim(),
         listing_title: selectedThread.listingTitle
       });
+      
+      // Create notification for recipient
+      await base44.entities.Notification.create({
+        user_email: selectedThread.otherUser,
+        type: "message",
+        title: "New message",
+        message: `You have a new message about "${selectedThread.listingTitle}"`,
+        link: createPageUrl("Messages")
+      });
+      
       setNewMessage("");
       queryClient.invalidateQueries({ queryKey: ['messages'] });
     } catch (error) {

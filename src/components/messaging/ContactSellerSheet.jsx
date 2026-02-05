@@ -41,6 +41,15 @@ export default function ContactSellerSheet({ listing, children }) {
         listing_title: listing.title
       });
 
+      // Create notification for seller
+      await base44.entities.Notification.create({
+        user_email: listing.created_by,
+        type: "message",
+        title: "New message about your listing",
+        message: `Someone is interested in "${listing.title}"`,
+        link: createPageUrl("Messages")
+      });
+
       toast.success("Message sent!");
       setMessage("");
       setIsOpen(false);

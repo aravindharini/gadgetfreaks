@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import NotificationCenter from "@/components/notifications/NotificationCenter";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
@@ -84,11 +85,14 @@ export default function Layout({ children, currentPageName }) {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-1">
-              {navigation.map((item) => (
-                <NavLink key={item.name} item={item} />
-              ))}
-            </nav>
+            <div className="hidden md:flex items-center space-x-1">
+              <nav className="flex items-center space-x-1">
+                {navigation.map((item) => (
+                  <NavLink key={item.name} item={item} />
+                ))}
+              </nav>
+              <NotificationCenter />
+            </div>
 
             {/* Mobile Menu Button */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
