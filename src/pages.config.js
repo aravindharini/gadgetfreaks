@@ -56,6 +56,8 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Messages from './pages/Messages';
+import MyListings from './pages/MyListings';
+import SellerDashboard from './pages/SellerDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -69,6 +71,8 @@ export const PAGES = {
     "Checkout": Checkout,
     "OrderConfirmation": OrderConfirmation,
     "Messages": Messages,
+    "MyListings": MyListings,
+    "SellerDashboard": SellerDashboard,
 }
 
 export const pagesConfig = {
