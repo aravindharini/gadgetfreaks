@@ -21,6 +21,7 @@ export default function Browse() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCondition, setSelectedCondition] = useState("all");
   const [selectedBrand, setSelectedBrand] = useState("all");
+  const [selectedServiceType, setSelectedServiceType] = useState("all");
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [maxPrice, setMaxPrice] = useState(10000);
   const [sortBy, setSortBy] = useState("-created_date");
@@ -58,6 +59,11 @@ export default function Browse() {
       filtered = filtered.filter(item => item.brand === selectedBrand);
     }
 
+    // Service type filter (for services category)
+    if (selectedServiceType !== "all") {
+      filtered = filtered.filter(item => item.service_type === selectedServiceType);
+    }
+
     // Price range filter
     filtered = filtered.filter(item => 
       item.price >= priceRange[0] && item.price <= priceRange[1]
@@ -82,7 +88,7 @@ export default function Browse() {
     }
 
     setFilteredListings(filtered);
-  }, [listings, searchQuery, selectedCategory, selectedCondition, selectedBrand, priceRange, sortBy]); // Dependencies for useCallback
+  }, [listings, searchQuery, selectedCategory, selectedCondition, selectedBrand, selectedServiceType, priceRange, sortBy]); // Dependencies for useCallback
 
   useEffect(() => {
     loadListings();
@@ -127,6 +133,7 @@ export default function Browse() {
     setSelectedCategory("all");
     setSelectedCondition("all");
     setSelectedBrand("all");
+    setSelectedServiceType("all");
     setPriceRange([0, maxPrice]);
     setSortBy("-created_date");
   };
@@ -136,6 +143,7 @@ export default function Browse() {
     selectedCategory !== "all" ? selectedCategory : null,
     selectedCondition !== "all" ? selectedCondition : null,
     selectedBrand !== "all" ? selectedBrand : null,
+    selectedServiceType !== "all" ? selectedServiceType : null,
     priceRange[0] > 0 || priceRange[1] < maxPrice ? "price" : null
   ].filter(Boolean).length;
 
@@ -178,21 +186,42 @@ export default function Browse() {
         </Select>
       </div>
 
+      {/* Service Type (only for services category) */}
+      {selectedCategory === "services" && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Service Type</label>
+          <Select value={selectedServiceType} onValueChange={setSelectedServiceType}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Services</SelectItem>
+              <SelectItem value="hospital">Hospitals</SelectItem>
+              <SelectItem value="clinic">Clinics</SelectItem>
+              <SelectItem value="hotel">Hotels</SelectItem>
+              <SelectItem value="restaurant">Restaurants</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {/* Brand */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
-        <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Brands</SelectItem>
-            {availableBrands.map(brand => (
-              <SelectItem key={brand} value={brand}>{brand}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {selectedCategory !== "services" && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
+          <Select value={selectedBrand} onValueChange={setSelectedBrand}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Brands</SelectItem>
+              {availableBrands.map(brand => (
+                <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       {/* Condition */}
       <div>
