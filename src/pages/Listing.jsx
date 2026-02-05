@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import { Listing } from "@/entities/Listing";
 import { Cart } from "@/entities/Cart";
@@ -22,10 +21,10 @@ import {
   Package,
   Palette,
   HardDrive,
-  Wifi,
-  MessageCircle
+  Wifi
 } from "lucide-react";
 import { toast } from "sonner";
+import ContactSellerSheet from "../components/messaging/ContactSellerSheet";
 
 const conditionColors = {
   mint: "bg-emerald-100 text-emerald-800 border-emerald-200",
@@ -226,10 +225,7 @@ export default function ListingPage() {
               </div>
 
               {/* Contact Seller */}
-              <Button variant="outline" className="w-full mb-6">
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Contact Seller
-              </Button>
+              <ContactSellerSheet listing={listing} />
             </div>
 
             {/* Device Specifications */}
