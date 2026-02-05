@@ -5,7 +5,7 @@ import { Cart } from "@/entities/Cart";
 import { User } from "@/entities/User";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Shield, ShoppingCart, Heart } from "lucide-react";
+import { Shield, ShoppingCart, Heart, Gavel, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 const conditionColors = {
@@ -64,11 +64,19 @@ export default function ListingCard({ listing }) {
             alt={listing.title}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
-          {listing.featured && (
-            <Badge className="absolute top-3 left-3 bg-orange-500 text-white border-0">
-              Featured
-            </Badge>
-          )}
+          <div className="absolute top-3 left-3 flex gap-2">
+            {listing.featured && (
+              <Badge className="bg-orange-500 text-white border-0">
+                Featured
+              </Badge>
+            )}
+            {listing.is_auction && (
+              <Badge className="bg-blue-500 text-white border-0">
+                <Gavel className="w-3 h-3 mr-1" />
+                Auction
+              </Badge>
+            )}
+          </div>
           <Badge 
             className={`absolute top-3 right-3 border ${conditionColors[listing.condition] || conditionColors.good}`}
           >
@@ -97,30 +105,59 @@ export default function ListingCard({ listing }) {
           </div>
         </Link>
 
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-2xl font-bold text-gray-900">
-            RM{listing.price?.toLocaleString()}
-          </div>
-          <div className="flex items-center gap-1 text-sm text-gray-500">
-            <Shield className="w-4 h-4 text-emerald-500" />
-            <span>Verified</span>
-          </div>
-        </div>
+        {listing.is_auction ? (
+          <>
+            <div className="bg-blue-50 rounded-lg p-3 mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">Current Bid</span>
+                <div className="flex items-center gap-1 text-xs text-blue-600">
+                  <Clock className="w-3 h-3" />
+                  <span>Ending soon</span>
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-gray-900">
+                RM{(listing.current_bid || listing.starting_bid)?.toLocaleString()}
+              </div>
+              <p className="text-xs text-gray-600 mt-1">
+                {listing.bid_count || 0} bids
+              </p>
+            </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2">
-          <Button 
-            onClick={addToCart}
-            disabled={addingToCart || listing.status !== "active"}
-            className="flex-1 bg-blue-600 hover:bg-blue-700"
-          >
-            <ShoppingCart className="w-4 h-4 mr-2" />
-            {addingToCart ? "Adding..." : "Add to Cart"}
-          </Button>
-          <Button variant="outline" size="icon" className="flex-shrink-0">
-            <Heart className="w-4 h-4" />
-          </Button>
-        </div>
+            <Link to={createPageUrl(`Listing?id=${listing.id}`)}>
+              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                <Gavel className="w-4 h-4 mr-2" />
+                Place Bid
+              </Button>
+            </Link>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-2xl font-bold text-gray-900">
+                RM{listing.price?.toLocaleString()}
+              </div>
+              <div className="flex items-center gap-1 text-sm text-gray-500">
+                <Shield className="w-4 h-4 text-emerald-500" />
+                <span>Verified</span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <Button 
+                onClick={addToCart}
+                disabled={addingToCart || listing.status !== "active"}
+                className="flex-1 bg-blue-600 hover:bg-blue-700"
+              >
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                {addingToCart ? "Adding..." : "Add to Cart"}
+              </Button>
+              <Button variant="outline" size="icon" className="flex-shrink-0">
+                <Heart className="w-4 h-4" />
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
