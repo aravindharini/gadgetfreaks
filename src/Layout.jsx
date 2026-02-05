@@ -11,7 +11,8 @@ import {
   Smartphone,
   Menu,
   X,
-  ShoppingCart
+  ShoppingCart,
+  MessageCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +42,7 @@ export default function Layout({ children, currentPageName }) {
     { name: "Home", href: createPageUrl("Home"), icon: Home },
     { name: "Browse", href: createPageUrl("Browse"), icon: Search },
     { name: "Sell", href: createPageUrl("Sell"), icon: Plus },
+    { name: "Messages", href: createPageUrl("Messages"), icon: MessageCircle },
     { name: "Cart", href: createPageUrl("Cart"), icon: ShoppingCart, badge: cartCount },
     { name: "Profile", href: createPageUrl("Profile"), icon: UserIcon },
   ];
