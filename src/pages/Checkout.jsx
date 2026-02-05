@@ -1,9 +1,6 @@
-
 import React, { useState, useEffect, useCallback } from "react";
-import { Cart } from "@/entities/Cart";
-import { Listing } from "@/entities/Listing";
-import { Order } from "@/entities/Order";
-import { User } from "@/entities/User";
+import { base44 } from "@/api/base44Client";
+import { createCheckoutSession } from "@/functions/createCheckoutSession";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
@@ -11,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { 
   ArrowLeft, 
@@ -41,12 +37,11 @@ export default function Checkout() {
     phone: ""
   });
 
-  const [paymentMethod, setPaymentMethod] = useState("");
   const [orderNotes, setOrderNotes] = useState("");
 
   const loadCheckoutData = useCallback(async () => {
     try {
-      const userData = await User.me();
+      const userData = await base44.auth.me();
       setUser(userData);
       
       // Pre-fill shipping data from user profile
@@ -56,7 +51,7 @@ export default function Checkout() {
         phone: userData.phone || ""
       }));
 
-      const cartData = await Cart.filter({ created_by: userData.email }, "-created_date");
+      const cartData = await base44.entities.Cart.filter({ created_by: userData.email }, "-created_date");
       
       if (cartData.length === 0) {
         toast.error("Your cart is empty");
@@ -68,7 +63,7 @@ export default function Checkout() {
       
       // Load listing details
       const listingIds = cartData.map(item => item.listing_id);
-      const listingPromises = listingIds.map(id => Listing.get(id));
+      const listingPromises = listingIds.map(id => base44.entities.Listing.get(id));
       const listingData = await Promise.all(listingPromises);
       
       const listingsMap = {};
@@ -109,65 +104,55 @@ export default function Checkout() {
       return false;
     }
 
-    if (!paymentMethod) {
-      toast.error("Please select a payment method");
-      return false;
-    }
-
     return true;
   };
 
   const handlePlaceOrder = async () => {
     if (!validateForm()) return;
 
+    // Check if running in iframe (preview mode)
+    if (window.self !== window.top) {
+      toast.error("Checkout only works in published apps. Please publish your app to test payments.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // Generate order number
-      const orderNumber = `GF${Date.now()}${Math.floor(Math.random() * 1000)}`;
-
-      // Prepare order items
-      const orderItems = cartItems.map(cartItem => {
+      // Prepare cart items for checkout
+      const checkoutItems = cartItems.map(cartItem => {
         const listing = listings[cartItem.listing_id];
         return {
           listing_id: cartItem.listing_id,
           title: listing.title,
           price: listing.price,
           quantity: cartItem.quantity || 1,
-          seller_email: listing.created_by
+          seller_email: listing.created_by,
+          images: listing.images,
+          brand: listing.brand,
+          model: listing.model,
+          description: listing.description
         };
       });
 
-      // Create order
-      const orderData = {
-        order_number: orderNumber,
-        total_amount: getTotal(),
-        status: "pending",
-        items: orderItems,
-        shipping_address: shippingData,
-        payment_method: paymentMethod,
-        notes: orderNotes
-      };
+      // Create Stripe checkout session
+      const { data } = await createCheckoutSession({
+        cartItems: checkoutItems,
+        successUrl: `${window.location.origin}${createPageUrl('OrderConfirmation')}?session_id={CHECKOUT_SESSION_ID}`,
+        cancelUrl: `${window.location.origin}${createPageUrl('Cart')}`
+      });
 
-      const order = await Order.create(orderData);
-
-      // Clear cart
-      const deletePromises = cartItems.map(item => Cart.delete(item.id));
-      await Promise.all(deletePromises);
-
-      // Update listing status to sold
-      const updatePromises = cartItems.map(item => 
-        Listing.update(item.listing_id, { status: "sold" })
-      );
-      await Promise.all(updatePromises);
-
-      toast.success("Order placed successfully!");
-      navigate(createPageUrl(`OrderConfirmation?order=${order.id}`));
+      if (data.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
 
     } catch (error) {
-      console.error("Error placing order:", error);
-      toast.error("Failed to place order. Please try again.");
+      console.error("Error creating checkout:", error);
+      toast.error("Failed to start checkout. Please try again.");
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   if (isLoading) {
@@ -212,7 +197,7 @@ export default function Checkout() {
             <CreditCard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-gray-900 mb-2">Please Login</h2>
             <p className="text-gray-600 mb-4">You need to be logged in to checkout</p>
-            <Button onClick={() => User.login()}>Login</Button>
+            <Button onClick={() => base44.auth.redirectToLogin()}>Login</Button>
           </CardContent>
         </Card>
       </div>
@@ -324,26 +309,19 @@ export default function Checkout() {
               </CardContent>
             </Card>
 
-            {/* Payment Method */}
+            {/* Payment Information */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CreditCard className="w-5 h-5" />
-                  Payment Method
+                  Payment Information
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select payment method" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="credit_card">Credit Card</SelectItem>
-                    <SelectItem value="debit_card">Debit Card</SelectItem>
-                    <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                    <SelectItem value="digital_wallet">Digital Wallet (GrabPay, Touch 'n Go)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 p-4 rounded-lg">
+                  <Shield className="w-4 h-4 text-blue-600" />
+                  <span>Payment will be securely processed by Stripe</span>
+                </div>
               </CardContent>
             </Card>
 
