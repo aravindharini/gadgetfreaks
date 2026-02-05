@@ -53,6 +53,11 @@ export default function ListingPage() {
 
       const listingData = await Listing.get(listingId);
       setListing(listingData);
+      
+      // Track view
+      await Listing.update(listingId, { 
+        views: (listingData.views || 0) + 1 
+      });
     } catch (error) {
       console.error("Error loading listing:", error);
       navigate(createPageUrl("Browse"));
