@@ -4,7 +4,7 @@ import { createPageUrl } from "@/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, MapPin, Clock, Navigation, Globe } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Navigation, Globe, MessageCircle } from "lucide-react";
 
 export default function ServiceCard({ listing }) {
   const primaryImage = listing.images?.[0] || "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400&h=300&fit=crop";
@@ -116,7 +116,19 @@ export default function ServiceCard({ listing }) {
             </Button>
           )}
           
-          {listing.contact_phone && (
+          {listing.whatsapp_number ? (
+            <Button 
+              onClick={(e) => {
+                e.preventDefault();
+                const cleanNumber = listing.whatsapp_number.replace(/\D/g, '');
+                window.open(`https://wa.me/${cleanNumber}`, '_blank');
+              }}
+              className="flex-1 bg-green-600 hover:bg-green-700"
+            >
+              <MessageCircle className="w-4 h-4 mr-2" />
+              WhatsApp
+            </Button>
+          ) : listing.contact_phone && (
             <Button 
               onClick={(e) => {
                 e.preventDefault();

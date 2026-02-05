@@ -306,8 +306,8 @@ export default function ListingPage() {
         </div>
 
         {/* Description and Seller Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+        <div className={listing.category === "services" ? "" : "grid grid-cols-1 lg:grid-cols-3 gap-8"}>
+          <div className={listing.category === "services" ? "" : "lg:col-span-2"}>
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold text-gray-900 mb-4">Description</h3>
@@ -325,47 +325,49 @@ export default function ListingPage() {
             </Card>
           </div>
 
-          {/* Seller Info */}
-          <div>
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Seller Information</h3>
-                
-                <div className="flex items-center gap-3 mb-4">
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${listing.created_by}`} />
-                    <AvatarFallback>S</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium text-gray-900">Seller</p>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                      <span className="text-sm text-gray-600">5.0 rating</span>
+          {/* Seller Info - Hidden for services category */}
+          {listing.category !== "services" && (
+            <div>
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-gray-900 mb-4">Seller Information</h3>
+                  
+                  <div className="flex items-center gap-3 mb-4">
+                    <Avatar className="w-12 h-12">
+                      <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${listing.created_by}`} />
+                      <AvatarFallback>S</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium text-gray-900">Seller</p>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                        <span className="text-sm text-gray-600">5.0 rating</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-emerald-500" />
-                    <span className="text-gray-600">Verified seller</span>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-emerald-500" />
+                      <span className="text-gray-600">Verified seller</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Package className="w-4 h-4 text-blue-500" />
+                      <span className="text-gray-600">25+ items sold</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-600">Kuala Lumpur</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Package className="w-4 h-4 text-blue-500" />
-                    <span className="text-gray-600">25+ items sold</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">Kuala Lumpur</span>
-                  </div>
-                </div>
 
-                <Button variant="outline" className="w-full mt-4">
-                  View Seller Profile
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+                  <Button variant="outline" className="w-full mt-4">
+                    View Seller Profile
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     </div>
