@@ -51,13 +51,13 @@ import Home from './pages/Home';
 import Browse from './pages/Browse';
 import Sell from './pages/Sell';
 import Profile from './pages/Profile';
-import Listing from './pages/Listing';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Messages from './pages/Messages';
 import MyListings from './pages/MyListings';
 import SellerDashboard from './pages/SellerDashboard';
+import Listing from './pages/Listing';
 import __Layout from './Layout.jsx';
 
 
@@ -66,13 +66,13 @@ export const PAGES = {
     "Browse": Browse,
     "Sell": Sell,
     "Profile": Profile,
-    "Listing": Listing,
     "Cart": Cart,
     "Checkout": Checkout,
     "OrderConfirmation": OrderConfirmation,
     "Messages": Messages,
     "MyListings": MyListings,
     "SellerDashboard": SellerDashboard,
+    "Listing": Listing,
 }
 
 export const pagesConfig = {
