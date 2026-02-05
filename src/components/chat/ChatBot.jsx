@@ -17,6 +17,7 @@ export default function ChatBot() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef(null);
+  const unsubscribeRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -27,16 +28,16 @@ export default function ChatBot() {
   }, [messages]);
 
   useEffect(() => {
-    let unsubscribe;
     if (isOpen && !conversation) {
-      initializeChat().then(cleanup => {
-        unsubscribe = cleanup;
-      });
+      initializeChat();
     }
     return () => {
-      if (unsubscribe) unsubscribe();
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
     };
-  }, [isOpen, conversation]);
+  }, [isOpen]);
 
   const initializeChat = async () => {
     try {
@@ -62,16 +63,13 @@ export default function ChatBot() {
       setMessages(newConversation.messages || []);
 
       // Subscribe to updates
-      const unsubscribe = base44.agents.subscribeToConversation(
+      unsubscribeRef.current = base44.agents.subscribeToConversation(
         newConversation.id,
         (data) => {
           setMessages(data.messages);
           setIsSending(false);
         }
       );
-      
-      // Return cleanup function
-      return unsubscribe;
     } catch (error) {
       console.error("Error initializing chat:", error);
       toast.error(error.message || "Failed to initialize chat. Please try again.");
@@ -94,9 +92,9 @@ export default function ChatBot() {
       });
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error("Failed to send message");
+      toast.error(error.message || "Failed to send message");
+      setIsSending(false);
     }
-    setIsSending(false);
   };
 
   const handleKeyPress = (e) => {
