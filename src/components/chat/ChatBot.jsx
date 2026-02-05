@@ -27,10 +27,16 @@ export default function ChatBot() {
   }, [messages]);
 
   useEffect(() => {
+    let unsubscribe;
     if (isOpen && !conversation) {
-      initializeChat();
+      initializeChat().then(cleanup => {
+        unsubscribe = cleanup;
+      });
     }
-  }, [isOpen]);
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [isOpen, conversation]);
 
   const initializeChat = async () => {
     setIsLoading(true);
@@ -63,13 +69,15 @@ export default function ChatBot() {
         }
       );
 
-      // Cleanup on unmount
-      return () => unsubscribe();
+      setIsLoading(false);
+      
+      // Return cleanup function
+      return unsubscribe;
     } catch (error) {
       console.error("Error initializing chat:", error);
       toast.error("Failed to initialize chat");
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleSend = async () => {
