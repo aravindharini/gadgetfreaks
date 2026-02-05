@@ -9,7 +9,9 @@ import {
   Headphones,
   Gamepad2,
   Camera,
-  Cpu
+  Cpu,
+  CalendarClock,
+  Wrench
 } from "lucide-react";
 
 const categories = [
@@ -68,6 +70,20 @@ const categories = [
     icon: Cpu,
     color: "from-gray-500 to-gray-600",
     count: "1.5k+ listings"
+  },
+  {
+    id: "rentals",
+    name: "Rentals",
+    icon: CalendarClock,
+    color: "from-cyan-500 to-cyan-600",
+    count: "New"
+  },
+  {
+    id: "services",
+    name: "Services",
+    icon: Wrench,
+    color: "from-indigo-500 to-indigo-600",
+    count: "New"
   }
 ];
 
