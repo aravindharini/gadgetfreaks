@@ -22,7 +22,8 @@ import {
   Palette,
   HardDrive,
   Wifi,
-  Gavel
+  Gavel,
+  Globe
 } from "lucide-react";
 import { toast } from "sonner";
 import ContactSellerSheet from "../components/messaging/ContactSellerSheet";
@@ -223,23 +224,49 @@ export default function ListingPage() {
                 <BidSection listing={listing} onBidPlaced={loadListing} />
               ) : (
                 <>
-                  <div className="text-4xl font-bold text-gray-900 mb-6">
-                    RM{listing.price?.toLocaleString()}
-                  </div>
+                  {listing.category !== 'services' && (
+                    <div className="text-4xl font-bold text-gray-900 mb-6">
+                      RM{listing.price?.toLocaleString()}
+                    </div>
+                  )}
 
                   {/* Action Buttons */}
                   <div className="flex gap-3 mb-6">
-                    <Button 
-                      onClick={addToCart}
-                      disabled={addingToCart || listing.status !== "active"}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 h-12"
-                    >
-                      <ShoppingCart className="w-5 h-5 mr-2" />
-                      {addingToCart ? "Adding..." : "Add to Cart"}
-                    </Button>
-                    <Button variant="outline" size="icon" className="h-12 w-12">
-                      <Heart className="w-5 h-5" />
-                    </Button>
+                    {listing.category === 'services' ? (
+                      // Services: Show website link
+                      listing.website ? (
+                        <Button 
+                          onClick={() => window.open(listing.website, '_blank', 'noopener,noreferrer')}
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 h-12"
+                        >
+                          <Globe className="w-5 h-5 mr-2" />
+                          Visit Website
+                        </Button>
+                      ) : (
+                        <Button 
+                          disabled
+                          className="flex-1 h-12"
+                        >
+                          <Globe className="w-5 h-5 mr-2" />
+                          No Website Available
+                        </Button>
+                      )
+                    ) : (
+                      // Regular products: Show add to cart
+                      <>
+                        <Button 
+                          onClick={addToCart}
+                          disabled={addingToCart || listing.status !== "active"}
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 h-12"
+                        >
+                          <ShoppingCart className="w-5 h-5 mr-2" />
+                          {addingToCart ? "Adding..." : "Add to Cart"}
+                        </Button>
+                        <Button variant="outline" size="icon" className="h-12 w-12">
+                          <Heart className="w-5 h-5" />
+                        </Button>
+                      </>
+                    )}
                     <Button variant="outline" size="icon" className="h-12 w-12">
                       <Share2 className="w-5 h-5" />
                     </Button>
