@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import NotificationCenter from "@/components/notifications/NotificationCenter";
+import ChatBot from "@/components/chat/ChatBot";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
@@ -135,6 +136,9 @@ export default function Layout({ children, currentPageName }) {
       <main className="flex-1">
         {children}
       </main>
+
+      {/* AI Chatbot */}
+      <ChatBot />
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-16">
