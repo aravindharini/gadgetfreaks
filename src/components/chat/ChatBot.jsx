@@ -46,6 +46,7 @@ export default function ChatBot() {
       if (!user) {
         toast.error("Please login to use the chat assistant");
         setIsOpen(false);
+        setIsLoading(false);
         return;
       }
 
@@ -57,6 +58,8 @@ export default function ChatBot() {
           description: `Chat with ${user.full_name || user.email}`
         }
       });
+
+      console.log("Conversation created:", newConversation);
 
       setConversation(newConversation);
       setMessages(newConversation.messages || []);
