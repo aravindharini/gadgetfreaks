@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { X, Plus, DollarSign, Camera, CheckCircle } from "lucide-react";
+import { X, Plus, DollarSign, Camera, CheckCircle, Gavel } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Sell() {
@@ -31,7 +32,10 @@ export default function Sell() {
     color: "",
     carrier: "",
     seller_notes: "",
-    images: []
+    images: [],
+    is_auction: false,
+    starting_bid: "",
+    auction_end_date: ""
   });
 
   const handleInputChange = (field, value) => {
@@ -97,6 +101,18 @@ export default function Sell() {
         price: parseFloat(formData.price),
         status: "active"
       };
+
+      // Add auction-specific fields if it's an auction
+      if (formData.is_auction) {
+        if (!formData.starting_bid || !formData.auction_end_date) {
+          setError("Please fill in starting bid and end date for auctions");
+          setIsSubmitting(false);
+          return;
+        }
+        listingData.starting_bid = parseFloat(formData.starting_bid);
+        listingData.current_bid = parseFloat(formData.starting_bid);
+        listingData.bid_count = 0;
+      }
 
       await Listing.create(listingData);
       setSuccess(true);
@@ -225,7 +241,66 @@ export default function Sell() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Auction Toggle */}
+              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center gap-3">
+                  <Gavel className="w-5 h-5 text-blue-600" />
+                  <div>
+                    <Label className="text-base font-semibold">Enable Auction</Label>
+                    <p className="text-sm text-gray-600">Let buyers bid on this item</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={formData.is_auction}
+                  onCheckedChange={(checked) => handleInputChange('is_auction', checked)}
+                />
+              </div>
+
+              {formData.is_auction ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="starting_bid">Starting Bid (MYR) *</Label>
+                    <div className="relative mt-1">
+                      <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        id="starting_bid"
+                        type="number"
+                        placeholder="100"
+                        value={formData.starting_bid}
+                        onChange={(e) => handleInputChange('starting_bid', e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="price">Buy Now Price (MYR)</Label>
+                    <div className="relative mt-1">
+                      <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        id="price"
+                        type="number"
+                        placeholder="299 (Optional)"
+                        value={formData.price}
+                        onChange={(e) => handleInputChange('price', e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <Label htmlFor="auction_end_date">Auction End Date *</Label>
+                    <Input
+                      id="auction_end_date"
+                      type="datetime-local"
+                      value={formData.auction_end_date}
+                      onChange={(e) => handleInputChange('auction_end_date', e.target.value)}
+                      className="mt-1"
+                      min={new Date().toISOString().slice(0, 16)}
+                    />
+                  </div>
+                </div>
+              ) : (
                 <div>
                   <Label htmlFor="price">Price (MYR) *</Label>
                   <div className="relative mt-1">
@@ -240,6 +315,9 @@ export default function Sell() {
                     />
                   </div>
                 </div>
+              )}
+
+              <div>
 
                 <div>
                   <Label htmlFor="category">Category *</Label>

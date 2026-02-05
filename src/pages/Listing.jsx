@@ -21,10 +21,12 @@ import {
   Package,
   Palette,
   HardDrive,
-  Wifi
+  Wifi,
+  Gavel
 } from "lucide-react";
 import { toast } from "sonner";
 import ContactSellerSheet from "../components/messaging/ContactSellerSheet";
+import BidSection from "../components/bidding/BidSection";
 
 const conditionColors = {
   mint: "bg-emerald-100 text-emerald-800 border-emerald-200",
@@ -188,11 +190,19 @@ export default function ListingPage() {
           {/* Listing Details */}
           <div className="space-y-6">
             <div>
-              {listing.featured && (
-                <Badge className="mb-3 bg-orange-500 text-white border-0">
-                  Featured
-                </Badge>
-              )}
+              <div className="flex gap-2 mb-3">
+                {listing.featured && (
+                  <Badge className="bg-orange-500 text-white border-0">
+                    Featured
+                  </Badge>
+                )}
+                {listing.is_auction && (
+                  <Badge className="bg-blue-500 text-white border-0">
+                    <Gavel className="w-3 h-3 mr-1" />
+                    Auction
+                  </Badge>
+                )}
+              </div>
               
               <h1 className="text-3xl font-bold text-gray-900 mb-3">{listing.title}</h1>
               
@@ -207,30 +217,36 @@ export default function ListingPage() {
                 </div>
               </div>
 
-              <div className="text-4xl font-bold text-gray-900 mb-6">
-                RM{listing.price?.toLocaleString()}
-              </div>
+              {listing.is_auction ? (
+                <BidSection listing={listing} onBidPlaced={loadListing} />
+              ) : (
+                <>
+                  <div className="text-4xl font-bold text-gray-900 mb-6">
+                    RM{listing.price?.toLocaleString()}
+                  </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 mb-6">
-                <Button 
-                  onClick={addToCart}
-                  disabled={addingToCart || listing.status !== "active"}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 h-12"
-                >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  {addingToCart ? "Adding..." : "Add to Cart"}
-                </Button>
-                <Button variant="outline" size="icon" className="h-12 w-12">
-                  <Heart className="w-5 h-5" />
-                </Button>
-                <Button variant="outline" size="icon" className="h-12 w-12">
-                  <Share2 className="w-5 h-5" />
-                </Button>
-              </div>
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 mb-6">
+                    <Button 
+                      onClick={addToCart}
+                      disabled={addingToCart || listing.status !== "active"}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 h-12"
+                    >
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      {addingToCart ? "Adding..." : "Add to Cart"}
+                    </Button>
+                    <Button variant="outline" size="icon" className="h-12 w-12">
+                      <Heart className="w-5 h-5" />
+                    </Button>
+                    <Button variant="outline" size="icon" className="h-12 w-12">
+                      <Share2 className="w-5 h-5" />
+                    </Button>
+                  </div>
 
-              {/* Contact Seller */}
-              <ContactSellerSheet listing={listing} />
+                  {/* Contact Seller */}
+                  <ContactSellerSheet listing={listing} />
+                </>
+              )}
             </div>
 
             {/* Device Specifications */}
