@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { User } from "@/entities/User";
 import { Listing } from "@/entities/Listing";
@@ -44,6 +43,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import ListingCard from "../components/marketplace/ListingCard";
+import WhatsAppConnect from "../components/support/WhatsAppConnect";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -305,6 +305,11 @@ export default function Profile() {
             </div>
           </CardContent>
         </Card>
+
+        {/* WhatsApp Connect */}
+        <div className="mb-8">
+          <WhatsAppConnect />
+        </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
