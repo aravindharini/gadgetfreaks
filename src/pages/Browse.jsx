@@ -8,6 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import ListingCard from "../components/marketplace/ListingCard";
+import ServiceCard from "../components/services/ServiceCard";
 
 export default function Browse() {
   const [listings, setListings] = useState([]);
@@ -370,7 +371,11 @@ export default function Browse() {
                 : "space-y-4"
               }>
                 {filteredListings.map((listing) => (
-                  <ListingCard key={listing.id} listing={listing} />
+                  listing.category === "services" ? (
+                    <ServiceCard key={listing.id} listing={listing} />
+                  ) : (
+                    <ListingCard key={listing.id} listing={listing} />
+                  )
                 ))}
               </div>
             )}
