@@ -200,6 +200,8 @@ export default function Browse() {
               <SelectItem value="clinic">Clinics</SelectItem>
               <SelectItem value="hotel">Hotels</SelectItem>
               <SelectItem value="restaurant">Restaurants</SelectItem>
+              <SelectItem value="cafe">Cafes</SelectItem>
+              <SelectItem value="shopping_mall">Shopping Malls</SelectItem>
             </SelectContent>
           </Select>
         </div>
