@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import { Listing } from "@/entities/Listing";
 import { Search, Filter, Grid, List, SlidersHorizontal } from "lucide-react";
@@ -21,7 +20,8 @@ export default function Browse() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCondition, setSelectedCondition] = useState("all");
   const [selectedBrand, setSelectedBrand] = useState("all");
-  const [priceRange, setPriceRange] = useState([0, 2000]);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
+  const [maxPrice, setMaxPrice] = useState(10000);
   const [sortBy, setSortBy] = useState("-created_date");
   
   const [availableBrands, setAvailableBrands] = useState([]);
@@ -69,6 +69,15 @@ export default function Browse() {
       filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
     } else if (sortBy === "-created_date") {
       filtered.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+    } else if (sortBy === "created_date") {
+      filtered.sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+    } else if (sortBy === "relevance") {
+      // Sort by featured first, then by newest
+      filtered.sort((a, b) => {
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        return new Date(b.created_date) - new Date(a.created_date);
+      });
     }
 
     setFilteredListings(filtered);
@@ -100,6 +109,12 @@ export default function Browse() {
       // Extract unique brands
       const brands = [...new Set(data.map(item => item.brand).filter(Boolean))];
       setAvailableBrands(brands.sort());
+      
+      // Calculate max price from listings
+      const prices = data.map(item => item.price || 0);
+      const calculatedMaxPrice = Math.max(...prices, 10000);
+      setMaxPrice(calculatedMaxPrice);
+      setPriceRange([0, calculatedMaxPrice]);
     } catch (error) {
       console.error("Error loading listings:", error);
     }
@@ -111,7 +126,7 @@ export default function Browse() {
     setSelectedCategory("all");
     setSelectedCondition("all");
     setSelectedBrand("all");
-    setPriceRange([0, 2000]);
+    setPriceRange([0, maxPrice]);
     setSortBy("-created_date");
   };
 
@@ -120,7 +135,7 @@ export default function Browse() {
     selectedCategory !== "all" ? selectedCategory : null,
     selectedCondition !== "all" ? selectedCondition : null,
     selectedBrand !== "all" ? selectedBrand : null,
-    priceRange[0] > 0 || priceRange[1] < 2000 ? "price" : null
+    priceRange[0] > 0 || priceRange[1] < maxPrice ? "price" : null
   ].filter(Boolean).length;
 
   const FilterPanel = () => (
@@ -156,6 +171,8 @@ export default function Browse() {
             <SelectItem value="gaming">Gaming</SelectItem>
             <SelectItem value="camera">Cameras</SelectItem>
             <SelectItem value="accessories">Accessories</SelectItem>
+            <SelectItem value="rentals">Rentals</SelectItem>
+            <SelectItem value="services">Services</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -197,16 +214,37 @@ export default function Browse() {
       {/* Price Range */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Price Range: ${priceRange[0]} - ${priceRange[1]}
+          Price Range
         </label>
+        <div className="flex items-center gap-2 mb-3">
+          <Input
+            type="number"
+            value={priceRange[0]}
+            onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
+            className="w-24 text-sm"
+            placeholder="Min"
+          />
+          <span className="text-gray-500">-</span>
+          <Input
+            type="number"
+            value={priceRange[1]}
+            onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || maxPrice])}
+            className="w-24 text-sm"
+            placeholder="Max"
+          />
+        </div>
         <Slider
           value={priceRange}
           onValueChange={setPriceRange}
-          max={2000}
+          max={maxPrice}
           min={0}
-          step={25}
+          step={50}
           className="mt-2"
         />
+        <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <span>RM{priceRange[0]}</span>
+          <span>RM{priceRange[1]}</span>
+        </div>
       </div>
 
       <Button variant="outline" onClick={clearFilters} className="w-full">
@@ -241,8 +279,10 @@ export default function Browse() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="-created_date">Newest First</SelectItem>
+                    <SelectItem value="created_date">Oldest First</SelectItem>
                     <SelectItem value="price_low">Price: Low to High</SelectItem>
                     <SelectItem value="price_high">Price: High to Low</SelectItem>
+                    <SelectItem value="relevance">Most Relevant</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
