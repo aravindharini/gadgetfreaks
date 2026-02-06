@@ -59,6 +59,7 @@ import Profile from './pages/Profile';
 import Sell from './pages/Sell';
 import SellerDashboard from './pages/SellerDashboard';
 import Wishlist from './pages/Wishlist';
+import Bookings from './pages/Bookings';
 import __Layout from './Layout.jsx';
 
 
@@ -75,6 +76,7 @@ export const PAGES = {
     "Sell": Sell,
     "SellerDashboard": SellerDashboard,
     "Wishlist": Wishlist,
+    "Bookings": Bookings,
 }
 
 export const pagesConfig = {
