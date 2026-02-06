@@ -24,6 +24,8 @@ export default function Browse() {
   const [selectedServiceType, setSelectedServiceType] = useState("all");
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [maxPrice, setMaxPrice] = useState(10000);
+  const [distanceRange, setDistanceRange] = useState(50); // km
+  const [userLocation, setUserLocation] = useState(null);
   const [sortBy, setSortBy] = useState("-created_date");
   
   const [availableBrands, setAvailableBrands] = useState([]);
@@ -64,10 +66,26 @@ export default function Browse() {
       filtered = filtered.filter(item => item.service_type === selectedServiceType);
     }
 
-    // Price range filter
-    filtered = filtered.filter(item => 
-      item.price >= priceRange[0] && item.price <= priceRange[1]
-    );
+    // Price range filter (not for services)
+    if (selectedCategory !== "services") {
+      filtered = filtered.filter(item => 
+        item.price >= priceRange[0] && item.price <= priceRange[1]
+      );
+    }
+
+    // Distance filter (for services category)
+    if (selectedCategory === "services" && userLocation) {
+      filtered = filtered.filter(item => {
+        if (!item.latitude || !item.longitude) return false;
+        const distance = calculateDistance(
+          userLocation.lat, 
+          userLocation.lng, 
+          item.latitude, 
+          item.longitude
+        );
+        return distance <= distanceRange;
+      });
+    }
 
     // Sort
     if (sortBy === "price_low") {
@@ -88,10 +106,11 @@ export default function Browse() {
     }
 
     setFilteredListings(filtered);
-  }, [listings, searchQuery, selectedCategory, selectedCondition, selectedBrand, selectedServiceType, priceRange, sortBy]); // Dependencies for useCallback
+  }, [listings, searchQuery, selectedCategory, selectedCondition, selectedBrand, selectedServiceType, priceRange, sortBy, distanceRange, userLocation]); // Dependencies for useCallback
 
   useEffect(() => {
     loadListings();
+    getUserLocation();
     
     // Get URL params
     const urlParams = new URLSearchParams(window.location.search);
@@ -101,6 +120,40 @@ export default function Browse() {
     if (category) setSelectedCategory(category);
     if (search) setSearchQuery(search);
   }, []); // Empty dependency array means this runs once on mount
+
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.log("Location access denied or unavailable");
+          // Default to KL city center if location not available
+          setUserLocation({ lat: 3.1390, lng: 101.6869 });
+        }
+      );
+    } else {
+      // Default to KL city center
+      setUserLocation({ lat: 3.1390, lng: 101.6869 });
+    }
+  };
+
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    // Haversine formula to calculate distance in km
+    const R = 6371; // Radius of Earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
 
   useEffect(() => {
     // applyFilters is now a stable reference due to useCallback,
@@ -135,6 +188,7 @@ export default function Browse() {
     setSelectedBrand("all");
     setSelectedServiceType("all");
     setPriceRange([0, maxPrice]);
+    setDistanceRange(50);
     setSortBy("-created_date");
   };
 
@@ -144,7 +198,8 @@ export default function Browse() {
     selectedCondition !== "all" ? selectedCondition : null,
     selectedBrand !== "all" ? selectedBrand : null,
     selectedServiceType !== "all" ? selectedServiceType : null,
-    priceRange[0] > 0 || priceRange[1] < maxPrice ? "price" : null
+    selectedCategory !== "services" && (priceRange[0] > 0 || priceRange[1] < maxPrice) ? "price" : null,
+    selectedCategory === "services" && distanceRange < 50 ? "distance" : null
   ].filter(Boolean).length;
 
   const FilterPanel = () => (
@@ -245,41 +300,72 @@ export default function Browse() {
         </div>
       )}
 
-      {/* Price Range */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Price Range
-        </label>
-        <div className="flex items-center gap-2 mb-3">
-          <Input
-            type="number"
-            value={priceRange[0]}
-            onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
-            className="w-24 text-sm"
-            placeholder="Min"
+      {/* Price Range (not for services) */}
+      {selectedCategory !== "services" && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Price Range
+          </label>
+          <div className="flex items-center gap-2 mb-3">
+            <Input
+              type="number"
+              value={priceRange[0]}
+              onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
+              className="w-24 text-sm"
+              placeholder="Min"
+            />
+            <span className="text-gray-500">-</span>
+            <Input
+              type="number"
+              value={priceRange[1]}
+              onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || maxPrice])}
+              className="w-24 text-sm"
+              placeholder="Max"
+            />
+          </div>
+          <Slider
+            value={priceRange}
+            onValueChange={setPriceRange}
+            max={maxPrice}
+            min={0}
+            step={50}
+            className="mt-2"
           />
-          <span className="text-gray-500">-</span>
-          <Input
-            type="number"
-            value={priceRange[1]}
-            onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || maxPrice])}
-            className="w-24 text-sm"
-            placeholder="Max"
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>RM{priceRange[0]}</span>
+            <span>RM{priceRange[1]}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Distance Coverage (for services) */}
+      {selectedCategory === "services" && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Distance from Your Location
+          </label>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-2xl font-semibold text-blue-600">{distanceRange} km</span>
+          </div>
+          <Slider
+            value={[distanceRange]}
+            onValueChange={(value) => setDistanceRange(value[0])}
+            max={100}
+            min={1}
+            step={1}
+            className="mt-2"
           />
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>1 km</span>
+            <span>100 km</span>
+          </div>
+          {!userLocation && (
+            <p className="text-xs text-amber-600 mt-2">
+              Using default location. Enable location access for accurate results.
+            </p>
+          )}
         </div>
-        <Slider
-          value={priceRange}
-          onValueChange={setPriceRange}
-          max={maxPrice}
-          min={0}
-          step={50}
-          className="mt-2"
-        />
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>RM{priceRange[0]}</span>
-          <span>RM{priceRange[1]}</span>
-        </div>
-      </div>
+      )}
 
       <Button variant="outline" onClick={clearFilters} className="w-full">
         Clear Filters
