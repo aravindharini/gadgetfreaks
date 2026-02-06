@@ -280,57 +280,77 @@ export default function ListingPage() {
               )}
             </div>
 
-            {/* Device Specifications */}
+            {/* Device Specifications / Service Details */}
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Specifications</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  {listing.brand && (
-                    <div className="flex items-center gap-2">
-                      <Smartphone className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">Brand:</span>
-                      <span className="font-medium">{listing.brand}</span>
+                {listing.category === 'services' ? (
+                  <>
+                    <h3 className="font-semibold text-gray-900 mb-4">Services & Menu Offered</h3>
+                    {listing.services_offered && listing.services_offered.length > 0 ? (
+                      <div className="grid grid-cols-1 gap-2">
+                        {listing.services_offered.map((service, index) => (
+                          <div key={index} className="flex items-start gap-2 text-sm">
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
+                            <span className="text-gray-700">{service}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-sm">No services information available.</p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <h3 className="font-semibold text-gray-900 mb-4">Specifications</h3>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      {listing.brand && (
+                        <div className="flex items-center gap-2">
+                          <Smartphone className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-600">Brand:</span>
+                          <span className="font-medium">{listing.brand}</span>
+                        </div>
+                      )}
+                      
+                      {listing.model && (
+                        <div className="flex items-center gap-2">
+                          <Package className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-600">Model:</span>
+                          <span className="font-medium">{listing.model}</span>
+                        </div>
+                      )}
+                      
+                      {listing.storage && (
+                        <div className="flex items-center gap-2">
+                          <HardDrive className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-600">Storage:</span>
+                          <span className="font-medium">{listing.storage}</span>
+                        </div>
+                      )}
+                      
+                      {listing.color && (
+                        <div className="flex items-center gap-2">
+                          <Palette className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-600">Color:</span>
+                          <span className="font-medium">{listing.color}</span>
+                        </div>
+                      )}
+                      
+                      {listing.carrier && (
+                        <div className="flex items-center gap-2">
+                          <Wifi className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-600">Carrier:</span>
+                          <span className="font-medium">{listing.carrier}</span>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center gap-2">
+                        <Package className="w-4 h-4 text-gray-400" />
+                        <span className="text-gray-600">Category:</span>
+                        <span className="font-medium capitalize">{listing.category}</span>
+                      </div>
                     </div>
-                  )}
-                  
-                  {listing.model && (
-                    <div className="flex items-center gap-2">
-                      <Package className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">Model:</span>
-                      <span className="font-medium">{listing.model}</span>
-                    </div>
-                  )}
-                  
-                  {listing.storage && (
-                    <div className="flex items-center gap-2">
-                      <HardDrive className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">Storage:</span>
-                      <span className="font-medium">{listing.storage}</span>
-                    </div>
-                  )}
-                  
-                  {listing.color && (
-                    <div className="flex items-center gap-2">
-                      <Palette className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">Color:</span>
-                      <span className="font-medium">{listing.color}</span>
-                    </div>
-                  )}
-                  
-                  {listing.carrier && (
-                    <div className="flex items-center gap-2">
-                      <Wifi className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">Carrier:</span>
-                      <span className="font-medium">{listing.carrier}</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center gap-2">
-                    <Package className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">Category:</span>
-                    <span className="font-medium capitalize">{listing.category}</span>
-                  </div>
-                </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>

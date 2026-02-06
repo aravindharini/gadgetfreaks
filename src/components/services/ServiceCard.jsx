@@ -104,6 +104,28 @@ export default function ServiceCard({ listing }) {
           )}
         </div>
 
+        {/* Services Offered */}
+        {listing.services_offered && listing.services_offered.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <h4 className="text-sm font-semibold text-gray-900 mb-2">Services & Menu</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {listing.services_offered.slice(0, 8).map((service, index) => (
+                <span 
+                  key={index}
+                  className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs"
+                >
+                  {service}
+                </span>
+              ))}
+              {listing.services_offered.length > 8 && (
+                <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-medium">
+                  +{listing.services_offered.length - 8} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-2">
           {(listing.latitude || listing.address) && (
             <Button 
