@@ -44,26 +44,37 @@ export default function NotificationCenter() {
     enabled: !!user,
   });
 
-  // Real-time subscription
+  // Real-time subscription with error handling
   useEffect(() => {
     if (!user) return;
     
-    const unsubscribe = base44.entities.Notification.subscribe((event) => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      
-      // Show toast for new notifications
-      if (event.type === 'create' && event.data.user_email === user.email && !event.data.read) {
-        toast(event.data.title, {
-          description: event.data.message,
-          action: event.data.link ? {
-            label: "View",
-            onClick: () => navigate(event.data.link)
-          } : undefined
-        });
-      }
-    });
+    try {
+      const unsubscribe = base44.entities.Notification.subscribe((event) => {
+        queryClient.invalidateQueries({ queryKey: ['notifications'] });
+        
+        // Show toast for new notifications
+        if (event.type === 'create' && event.data.user_email === user.email && !event.data.read) {
+          toast(event.data.title, {
+            description: event.data.message,
+            action: event.data.link ? {
+              label: "View",
+              onClick: () => navigate(event.data.link)
+            } : undefined
+          });
+        }
+      });
 
-    return unsubscribe;
+      return () => {
+        if (unsubscribe) unsubscribe();
+      };
+    } catch (error) {
+      console.error("Notification subscription error:", error);
+      // Fallback to polling if subscription fails
+      const interval = setInterval(() => {
+        queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      }, 30000);
+      return () => clearInterval(interval);
+    }
   }, [user, queryClient, navigate]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
