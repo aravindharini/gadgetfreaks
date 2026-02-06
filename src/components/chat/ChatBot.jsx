@@ -62,17 +62,14 @@ export default function ChatBot() {
       setConversation(newConversation);
       setMessages(newConversation.messages || []);
 
-      // Use polling instead of subscriptions to avoid timeout issues
-      const interval = setInterval(async () => {
-        try {
-          const updated = await base44.agents.getConversation(newConversation.id);
-          setMessages(updated.messages || []);
+      // Subscribe to updates
+      unsubscribeRef.current = base44.agents.subscribeToConversation(
+        newConversation.id,
+        (data) => {
+          setMessages(data.messages);
           setIsSending(false);
-        } catch (e) {
-          console.error("Polling error:", e);
         }
-      }, 2000);
-      unsubscribeRef.current = () => clearInterval(interval);
+      );
     } catch (error) {
       console.error("Error initializing chat:", error);
       toast.error(error.message || "Failed to initialize chat. Please try again.");

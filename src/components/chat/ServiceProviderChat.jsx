@@ -22,6 +22,16 @@ export default function ServiceProviderChat({ booking, onClose }) {
 
   useEffect(() => {
     loadMessages();
+    
+    // Subscribe to real-time updates
+    const unsubscribe = base44.entities.Message.subscribe((event) => {
+      if (event.type === "create" && 
+          (event.data.booking_id === booking.id || event.data.listing_id === booking.listing_id)) {
+        loadMessages();
+      }
+    });
+
+    return unsubscribe;
   }, [booking.id]);
 
   useEffect(() => {

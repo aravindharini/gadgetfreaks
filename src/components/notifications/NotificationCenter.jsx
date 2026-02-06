@@ -44,16 +44,27 @@ export default function NotificationCenter() {
     enabled: !!user,
   });
 
-  // Polling for notifications (no real-time subscriptions to avoid timeouts)
+  // Real-time subscription
   useEffect(() => {
     if (!user) return;
     
-    const interval = setInterval(() => {
+    const unsubscribe = base44.entities.Notification.subscribe((event) => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-    }, 30000);
-    
-    return () => clearInterval(interval);
-  }, [user, queryClient]);
+      
+      // Show toast for new notifications
+      if (event.type === 'create' && event.data.user_email === user.email && !event.data.read) {
+        toast(event.data.title, {
+          description: event.data.message,
+          action: event.data.link ? {
+            label: "View",
+            onClick: () => navigate(event.data.link)
+          } : undefined
+        });
+      }
+    });
+
+    return unsubscribe;
+  }, [user, queryClient, navigate]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
