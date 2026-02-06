@@ -39,7 +39,14 @@ Deno.serve(async (req) => {
             const searchRes = await fetch(searchUrl);
             const searchData = await searchRes.json();
 
-            if (searchData.status !== 'OK') {
+            console.log(`Search for ${type}:`, searchData.status, `Results: ${searchData.results?.length || 0}`);
+
+            if (searchData.status !== 'OK' && searchData.status !== 'ZERO_RESULTS') {
+                console.log(`Error for type ${type}:`, searchData.status, searchData.error_message);
+                continue;
+            }
+
+            if (!searchData.results || searchData.results.length === 0) {
                 console.log(`No results for type: ${type}`);
                 continue;
             }
