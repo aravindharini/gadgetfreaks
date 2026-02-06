@@ -96,6 +96,15 @@ export default function Browse() {
       filtered.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
     } else if (sortBy === "created_date") {
       filtered.sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+    } else if (sortBy === "nearest" && userLocation) {
+      // Sort by distance from user location (for services)
+      filtered.sort((a, b) => {
+        if (!a.latitude || !a.longitude) return 1;
+        if (!b.latitude || !b.longitude) return -1;
+        const distA = calculateDistance(userLocation.lat, userLocation.lng, a.latitude, a.longitude);
+        const distB = calculateDistance(userLocation.lat, userLocation.lng, b.latitude, b.longitude);
+        return distA - distB;
+      });
     } else if (sortBy === "relevance") {
       // Sort by featured first, then by newest
       filtered.sort((a, b) => {
@@ -400,8 +409,15 @@ export default function Browse() {
                   <SelectContent>
                     <SelectItem value="-created_date">Newest First</SelectItem>
                     <SelectItem value="created_date">Oldest First</SelectItem>
-                    <SelectItem value="price_low">Price: Low to High</SelectItem>
-                    <SelectItem value="price_high">Price: High to Low</SelectItem>
+                    {selectedCategory !== "services" && (
+                      <>
+                        <SelectItem value="price_low">Price: Low to High</SelectItem>
+                        <SelectItem value="price_high">Price: High to Low</SelectItem>
+                      </>
+                    )}
+                    {selectedCategory === "services" && userLocation && (
+                      <SelectItem value="nearest">Nearest Location</SelectItem>
+                    )}
                     <SelectItem value="relevance">Most Relevant</SelectItem>
                   </SelectContent>
                 </Select>
