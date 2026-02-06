@@ -175,6 +175,7 @@ export default function Browse() {
     // applyFilters is now a stable reference due to useCallback,
     // so it can be safely used as a dependency here.
     applyFilters();
+    setDisplayCount(20); // Reset pagination when filters change
   }, [applyFilters]); // Now correctly depends on the memoized applyFilters
 
   const loadListings = async () => {
