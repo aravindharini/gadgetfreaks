@@ -214,7 +214,7 @@ export default function Browse() {
     selectedBrand !== "all" ? selectedBrand : null,
     selectedServiceType !== "all" ? selectedServiceType : null,
     selectedCategory !== "services" && (priceRange[0] > 0 || priceRange[1] < maxPrice) ? "price" : null,
-    selectedCategory === "services" && distanceRange < 50 ? "distance" : null
+    selectedCategory === "services" && distanceRange < 1000 ? "distance" : null
   ].filter(Boolean).length;
 
   const FilterPanel = () => (
@@ -365,14 +365,14 @@ export default function Browse() {
           <Slider
             value={[distanceRange]}
             onValueChange={(value) => setDistanceRange(value[0])}
-            max={100}
+            max={1000}
             min={1}
-            step={1}
+            step={5}
             className="mt-2"
           />
           <div className="flex justify-between text-xs text-gray-500 mt-1">
             <span>1 km</span>
-            <span>100 km</span>
+            <span>1000 km (Entire Malaysia)</span>
           </div>
           {!userLocation && (
             <p className="text-xs text-amber-600 mt-2">
