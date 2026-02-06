@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, MapPin, Phone, Mail, FileText, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Calendar, Clock, MapPin, Phone, Mail, FileText, Loader2, CheckCircle, XCircle, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "react-hot-toast";
 
@@ -16,7 +16,24 @@ export default function BookingsPage() {
 
   useEffect(() => {
     loadData();
+    checkPaymentSuccess();
   }, []);
+
+  const checkPaymentSuccess = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    const bookingId = urlParams.get('booking_id');
+    const canceled = urlParams.get('canceled');
+
+    if (sessionId && bookingId) {
+      toast.success("Payment successful! Your booking is confirmed.");
+      // Clean up URL
+      window.history.replaceState({}, '', '/bookings');
+    } else if (canceled) {
+      toast.error("Payment was canceled. Please try again.");
+      window.history.replaceState({}, '', '/bookings');
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -54,6 +71,12 @@ export default function BookingsPage() {
     completed: "bg-blue-100 text-blue-800"
   };
 
+  const paymentStatusColors = {
+    unpaid: "bg-gray-100 text-gray-800",
+    paid: "bg-green-100 text-green-800",
+    refunded: "bg-orange-100 text-orange-800"
+  };
+
   const BookingCard = ({ booking, isProvider }) => (
     <Card>
       <CardHeader>
@@ -64,9 +87,15 @@ export default function BookingsPage() {
               Booking ID: {booking.id.slice(0, 8)}
             </p>
           </div>
-          <Badge className={statusColors[booking.status]}>
-            {booking.status}
-          </Badge>
+          <div className="flex flex-col gap-2">
+            <Badge className={statusColors[booking.status]}>
+              {booking.status}
+            </Badge>
+            <Badge className={paymentStatusColors[booking.payment_status || 'unpaid']}>
+              <CreditCard className="w-3 h-3 mr-1" />
+              {booking.payment_status || 'unpaid'}
+            </Badge>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

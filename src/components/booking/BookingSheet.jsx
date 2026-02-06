@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { createBookingCheckout } from "@/functions/createBookingCheckout";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { Calendar as CalendarIcon, Clock, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Loader2, CreditCard } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { format } from "date-fns";
 
@@ -65,37 +66,28 @@ export default function BookingSheet({ listing, trigger }) {
         customer_name: formData.customer_name || user.full_name,
         customer_phone: formData.customer_phone,
         customer_email: formData.customer_email || user.email,
-        total_price: totalPrice,
-        status: "pending"
+        total_price: totalPrice
       };
 
-      await base44.entities.Booking.create(bookingData);
+      // Create Stripe checkout session
+      const { data: checkoutData } = await createBookingCheckout({ bookingData });
 
-      // Create notification for service provider
-      await base44.entities.Notification.create({
-        user_email: listing.created_by,
-        type: "system",
-        title: "New Booking Request",
-        message: `${bookingData.customer_name} has requested a booking for ${listing.title} on ${format(selectedDate, "MMM dd, yyyy")} at ${formData.booking_time}`,
-        link: `/bookings`
-      });
+      if (checkoutData.url) {
+        // Check if running in iframe (preview mode)
+        if (window.self !== window.top) {
+          toast.error("Payment checkout only works on published apps. Please publish your app to accept payments.");
+          setLoading(false);
+          return;
+        }
 
-      toast.success("Booking request sent successfully!");
-      setOpen(false);
-      setFormData({
-        booking_time: "",
-        duration: 60,
-        service_details: "",
-        additional_notes: "",
-        customer_name: "",
-        customer_phone: "",
-        customer_email: "",
-      });
-      setSelectedDate(null);
+        // Redirect to Stripe checkout
+        window.location.href = checkoutData.url;
+      } else {
+        throw new Error("Failed to create checkout session");
+      }
     } catch (error) {
       console.error("Booking error:", error);
       toast.error(error.message || "Failed to create booking");
-    } finally {
       setLoading(false);
     }
   };
@@ -232,16 +224,23 @@ export default function BookingSheet({ listing, trigger }) {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Sending Request...
+                Processing...
               </>
             ) : (
-              "Send Booking Request"
+              <>
+                <CreditCard className="w-4 h-4 mr-2" />
+                Proceed to Payment
+              </>
             )}
           </Button>
+          
+          <p className="text-xs text-center text-gray-500 mt-2">
+            You'll be redirected to secure payment via Stripe
+          </p>
         </form>
       </SheetContent>
     </Sheet>
