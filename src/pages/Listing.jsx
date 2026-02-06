@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Listing } from "@/entities/Listing";
 import { Cart } from "@/entities/Cart";
+import { Wishlist } from "@/entities/Wishlist";
 import { User } from "@/entities/User";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";

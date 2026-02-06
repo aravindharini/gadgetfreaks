@@ -58,6 +58,7 @@ import OrderConfirmation from './pages/OrderConfirmation';
 import Profile from './pages/Profile';
 import Sell from './pages/Sell';
 import SellerDashboard from './pages/SellerDashboard';
+import Wishlist from './pages/Wishlist';
 import __Layout from './Layout.jsx';
 
 
@@ -73,6 +74,7 @@ export const PAGES = {
     "Profile": Profile,
     "Sell": Sell,
     "SellerDashboard": SellerDashboard,
+    "Wishlist": Wishlist,
 }
 
 export const pagesConfig = {
