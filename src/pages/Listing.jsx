@@ -24,11 +24,13 @@ import {
   HardDrive,
   Wifi,
   Gavel,
-  Globe
+  Globe,
+  CalendarCheck
 } from "lucide-react";
 import { toast } from "sonner";
 import ContactSellerSheet from "../components/messaging/ContactSellerSheet";
 import BidSection from "../components/bidding/BidSection";
+import BookingSheet from "../components/booking/BookingSheet";
 
 const conditionColors = {
   mint: "bg-emerald-100 text-emerald-800 border-emerald-200",
@@ -286,24 +288,28 @@ export default function ListingPage() {
                   {/* Action Buttons */}
                   <div className="flex gap-3 mb-6">
                     {listing.category === 'services' ? (
-                      // Services: Show website link
-                      listing.website ? (
-                        <Button 
-                          onClick={() => window.open(listing.website, '_blank', 'noopener,noreferrer')}
-                          className="flex-1 bg-blue-600 hover:bg-blue-700 h-12"
-                        >
-                          <Globe className="w-5 h-5 mr-2" />
-                          Visit Website
-                        </Button>
-                      ) : (
-                        <Button 
-                          disabled
-                          className="flex-1 h-12"
-                        >
-                          <Globe className="w-5 h-5 mr-2" />
-                          No Website Available
-                        </Button>
-                      )
+                      // Services: Show booking button
+                      <>
+                        <BookingSheet 
+                          listing={listing}
+                          trigger={
+                            <Button className="flex-1 bg-blue-600 hover:bg-blue-700 h-12">
+                              <CalendarCheck className="w-5 h-5 mr-2" />
+                              Book Now
+                            </Button>
+                          }
+                        />
+                        {listing.website && (
+                          <Button 
+                            onClick={() => window.open(listing.website, '_blank', 'noopener,noreferrer')}
+                            variant="outline"
+                            className="h-12"
+                          >
+                            <Globe className="w-5 h-5 mr-2" />
+                            Website
+                          </Button>
+                        )}
+                      </>
                     ) : (
                       // Regular products: Show add to cart
                       <>
