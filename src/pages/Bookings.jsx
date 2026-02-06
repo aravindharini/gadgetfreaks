@@ -4,9 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, MapPin, Phone, Mail, FileText, Loader2, CheckCircle, XCircle, CreditCard } from "lucide-react";
+import { Calendar, Clock, MapPin, Phone, Mail, FileText, Loader2, CheckCircle, XCircle, CreditCard, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "react-hot-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import ServiceProviderChat from "@/components/chat/ServiceProviderChat";
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
