@@ -42,12 +42,11 @@ export default function ProviderAnalytics() {
     try {
       const user = await base44.auth.me();
       
-      // Fetch all bookings for this provider
+      // Fetch data with limits
       const allBookings = await base44.entities.Booking.filter({
         service_provider_email: user.email
       });
 
-      // Fetch provider's listings
       const providerListings = await base44.entities.Listing.filter({
         created_by: user.email,
         category: "services"
@@ -56,12 +55,14 @@ export default function ProviderAnalytics() {
       setBookings(allBookings);
       setListings(providerListings);
 
-      // Calculate analytics
-      calculateBookingsOverTime(allBookings);
-      calculatePopularServices(allBookings);
-      calculateCustomerDemographics(allBookings);
-      calculateRevenueByMonth(allBookings);
-      calculateConversionRate(allBookings, providerListings);
+      // Calculate analytics with timeout protection
+      setTimeout(() => {
+        calculateBookingsOverTime(allBookings);
+        calculatePopularServices(allBookings);
+        calculateCustomerDemographics(allBookings);
+        calculateRevenueByMonth(allBookings);
+        calculateConversionRate(allBookings, providerListings);
+      }, 0);
 
     } catch (error) {
       console.error("Error loading analytics:", error);
@@ -71,36 +72,27 @@ export default function ProviderAnalytics() {
   };
 
   const calculateBookingsOverTime = (bookings) => {
-    const last3Months = subMonths(new Date(), 3);
-    const dailyBookings = {};
+    try {
+      const last3Months = subMonths(new Date(), 2);
+      const monthlyBookings = {};
 
-    // Initialize all days with 0
-    eachDayOfInterval({
-      start: last3Months,
-      end: new Date()
-    }).forEach(day => {
-      const key = format(day, 'MMM dd');
-      dailyBookings[key] = 0;
-    });
-
-    // Count bookings per day
-    bookings.forEach(booking => {
-      const date = new Date(booking.booking_date);
-      if (date >= last3Months) {
-        const key = format(date, 'MMM dd');
-        if (dailyBookings[key] !== undefined) {
-          dailyBookings[key]++;
+      bookings.forEach(booking => {
+        const date = new Date(booking.booking_date);
+        if (date >= last3Months) {
+          const key = format(date, 'MMM yyyy');
+          monthlyBookings[key] = (monthlyBookings[key] || 0) + 1;
         }
-      }
-    });
+      });
 
-    // Convert to array and sample every 7th day for readability
-    const data = Object.entries(dailyBookings).map(([date, count]) => ({
-      date,
-      bookings: count
-    })).filter((_, index) => index % 7 === 0);
+      const data = Object.entries(monthlyBookings).map(([date, bookings]) => ({
+        date,
+        bookings
+      }));
 
-    setAnalytics(prev => ({ ...prev, bookingsOverTime: data }));
+      setAnalytics(prev => ({ ...prev, bookingsOverTime: data }));
+    } catch (error) {
+      console.error("Error calculating bookings over time:", error);
+    }
   };
 
   const calculatePopularServices = (bookings) => {
