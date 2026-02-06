@@ -148,11 +148,19 @@ export default function BookingsPage() {
           </div>
         )}
 
-        <div className="pt-3 border-t">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Total Price:</span>
-            <span className="text-xl font-bold text-blue-600">RM {booking.total_price}</span>
-          </div>
+        <div className="pt-3 border-t flex justify-between items-center">
+          <span className="text-xl font-bold text-green-600">RM {booking.total_price}</span>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <MessageCircle className="w-4 h-4 mr-1" />
+                Chat
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl">
+              <ServiceProviderChat booking={booking} />
+            </DialogContent>
+          </Dialog>
         </div>
 
         {isProvider && booking.status === "pending" && (
