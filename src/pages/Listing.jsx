@@ -207,18 +207,18 @@ export default function ListingPage() {
               
               <h1 className="text-3xl font-bold text-gray-900 mb-3">{listing.title}</h1>
               
-              <div className="flex items-center gap-4 mb-4">
-                {listing.category !== 'services' && (
+              {listing.category !== 'services' && (
+                <div className="flex items-center gap-4 mb-4">
                   <Badge className={`border ${conditionColors[listing.condition] || conditionColors.good}`}>
                     {listing.condition} condition
                   </Badge>
-                )}
-                
-                <div className="flex items-center gap-1 text-sm text-gray-500">
-                  <Calendar className="w-4 h-4" />
-                  <span>Listed {new Date(listing.created_date).toLocaleDateString()}</span>
+                  
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <Calendar className="w-4 h-4" />
+                    <span>Listed {new Date(listing.created_date).toLocaleDateString()}</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {listing.is_auction ? (
                 <BidSection listing={listing} onBidPlaced={loadListing} />
