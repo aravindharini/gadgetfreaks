@@ -32,7 +32,44 @@ Deno.serve(async (req) => {
       const session = event.data.object;
       const metadata = session.metadata;
 
-      if (metadata.cart_items && metadata.user_email) {
+      // Handle booking payments
+      if (metadata.booking_id) {
+        console.log('Processing booking payment for:', metadata.booking_id);
+        
+        try {
+          // Update booking payment status
+          await base44.asServiceRole.entities.Booking.update(metadata.booking_id, {
+            payment_status: "paid",
+            payment_intent_id: session.payment_intent,
+            status: "confirmed"
+          });
+
+          // Get booking details
+          const booking = await base44.asServiceRole.entities.Booking.get(metadata.booking_id);
+
+          // Notify service provider
+          await base44.asServiceRole.entities.Notification.create({
+            user_email: booking.service_provider_email,
+            type: "system",
+            title: "Booking Payment Received",
+            message: `Payment received for ${booking.listing_title} on ${booking.booking_date} at ${booking.booking_time}. Booking confirmed!`,
+            link: `/bookings`
+          });
+
+          // Notify customer
+          await base44.asServiceRole.entities.Notification.create({
+            user_email: booking.customer_email,
+            type: "system",
+            title: "Booking Confirmed",
+            message: `Your booking for ${booking.listing_title} on ${booking.booking_date} at ${booking.booking_time} has been confirmed!`,
+            link: `/bookings`
+          });
+
+          console.log('Booking payment processed successfully');
+        } catch (error) {
+          console.error('Error processing booking payment:', error);
+        }
+      } else if (metadata.cart_items && metadata.user_email) {
         const cartItems = JSON.parse(metadata.cart_items);
         
         // Create order
