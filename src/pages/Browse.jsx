@@ -15,6 +15,7 @@ export default function Browse() {
   const [filteredListings, setFilteredListings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState("grid");
+  const [displayCount, setDisplayCount] = useState(20);
   
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -178,7 +179,8 @@ export default function Browse() {
 
   const loadListings = async () => {
     try {
-      const data = await Listing.filter({ status: "active" }, "-created_date", 100);
+      // Load in smaller batches for better performance
+      const data = await Listing.filter({ status: "active" }, "-created_date", 50);
       setListings(data);
       
       // Extract unique brands
@@ -205,6 +207,7 @@ export default function Browse() {
     setPriceRange([0, maxPrice]);
     setDistanceRange(50);
     setSortBy("-created_date");
+    setDisplayCount(20);
   };
 
   const activeFiltersCount = [
@@ -504,28 +507,41 @@ export default function Browse() {
                 ))}
               </div>
             ) : filteredListings.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="w-8 h-8 text-gray-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No items found</h3>
-                <p className="text-gray-600 mb-6">Try adjusting your filters or search terms</p>
-                <Button onClick={clearFilters}>Clear Filters</Button>
-              </div>
-            ) : (
-              <div className={viewMode === "grid" 
-                ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" 
-                : "space-y-4"
-              }>
-                {filteredListings.map((listing) => (
-                  listing.category === "services" ? (
-                    <ServiceCard key={listing.id} listing={listing} />
-                  ) : (
-                    <ListingCard key={listing.id} listing={listing} />
-                  )
-                ))}
-              </div>
-            )}
+               <div className="text-center py-16">
+                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                   <Search className="w-8 h-8 text-gray-400" />
+                 </div>
+                 <h3 className="text-xl font-semibold text-gray-900 mb-2">No items found</h3>
+                 <p className="text-gray-600 mb-6">Try adjusting your filters or search terms</p>
+                 <Button onClick={clearFilters}>Clear Filters</Button>
+               </div>
+             ) : (
+               <>
+                 <div className={viewMode === "grid" 
+                   ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" 
+                   : "space-y-4"
+                 }>
+                   {filteredListings.slice(0, displayCount).map((listing) => (
+                     listing.category === "services" ? (
+                       <ServiceCard key={listing.id} listing={listing} />
+                     ) : (
+                       <ListingCard key={listing.id} listing={listing} />
+                     )
+                   ))}
+                 </div>
+
+                 {displayCount < filteredListings.length && (
+                   <div className="flex justify-center mt-8">
+                     <Button 
+                       onClick={() => setDisplayCount(prev => prev + 20)}
+                       variant="outline"
+                     >
+                       Load More ({filteredListings.length - displayCount} remaining)
+                     </Button>
+                   </div>
+                 )}
+               </>
+             )}
           </div>
         </div>
       </div>
