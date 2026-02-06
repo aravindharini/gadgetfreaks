@@ -23,15 +23,24 @@ export default function ServiceProviderChat({ booking, onClose }) {
   useEffect(() => {
     loadMessages();
     
-    // Subscribe to real-time updates
-    const unsubscribe = base44.entities.Message.subscribe((event) => {
-      if (event.type === "create" && 
-          (event.data.booking_id === booking.id || event.data.listing_id === booking.listing_id)) {
-        loadMessages();
+    // Subscribe to real-time updates with a small delay to ensure connection is ready
+    const timer = setTimeout(() => {
+      try {
+        const unsubscribe = base44.entities.Message.subscribe((event) => {
+          if (event.type === "create" && 
+              (event.data.booking_id === booking.id || event.data.listing_id === booking.listing_id)) {
+            loadMessages();
+          }
+        });
+        return () => {
+          if (unsubscribe) unsubscribe();
+        };
+      } catch (error) {
+        console.error("Subscription error:", error);
       }
-    });
+    }, 100);
 
-    return unsubscribe;
+    return () => clearTimeout(timer);
   }, [booking.id]);
 
   useEffect(() => {
