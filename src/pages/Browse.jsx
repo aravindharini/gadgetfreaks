@@ -117,6 +117,12 @@ export default function Browse() {
     setFilteredListings(filtered);
   }, [listings, searchQuery, selectedCategory, selectedCondition, selectedBrand, selectedServiceType, priceRange, sortBy, distanceRange, userLocation]); // Dependencies for useCallback
 
+  // Helper function to calculate distance
+  const getDistanceForListing = useCallback((listing) => {
+    if (!userLocation || !listing.latitude || !listing.longitude) return Infinity;
+    return calculateDistance(userLocation.lat, userLocation.lng, listing.latitude, listing.longitude);
+  }, [userLocation]);
+
   useEffect(() => {
     loadListings();
     getUserLocation();
