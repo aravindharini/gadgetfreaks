@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
 import { User } from "@/entities/User";
 import { Listing } from "@/entities/Listing";
 import { Link } from "react-router-dom";
@@ -22,8 +23,10 @@ import {
   TrendingUp,
   DollarSign,
   Calendar,
-  LogOut // Added LogOut icon
+  LogOut,
+  Download
 } from "lucide-react";
+import { toast } from "sonner";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -57,6 +60,7 @@ export default function Profile() {
     bio: ""
   });
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
 
   useEffect(() => {
     loadUserData();
@@ -106,17 +110,41 @@ export default function Profile() {
     setIsUpdating(false);
   };
 
-  // handleLogout function added
   const handleLogout = async () => {
     try {
       await User.logout();
       toast.success("You have been logged out.");
-      // Redirect to home and force a reload to clear state
       window.location.href = createPageUrl("Home");
     } catch (error) {
       console.error("Logout failed:", error);
       toast.error("Logout failed. Please try again.");
     }
+  };
+
+  const handleImportGooglePlaces = async () => {
+    if (!user || user.role !== 'admin') {
+      toast.error("Admin access required");
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      const response = await base44.functions.invoke('importGooglePlaces', {
+        location: "Malaysia",
+        types: ["hospital", "doctor", "night_club", "bar", "lodging"]
+      });
+
+      if (response.success) {
+        toast.success(`Successfully imported ${response.imported} establishments!`);
+        await loadUserData();
+      } else {
+        toast.error(response.error || "Import failed");
+      }
+    } catch (error) {
+      console.error("Error importing places:", error);
+      toast.error("Failed to import establishments");
+    }
+    setIsImporting(false);
   };
 
   const getFilteredListings = () => {
@@ -289,8 +317,19 @@ export default function Profile() {
                         New Listing
                       </Button>
                     </Link>
+
+                    {user.role === 'admin' && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={handleImportGooglePlaces}
+                        disabled={isImporting}
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        {isImporting ? "Importing..." : "Import Places"}
+                      </Button>
+                    )}
                     
-                    {/* Logout Button added */}
                     <Button variant="outline" size="sm" onClick={handleLogout}>
                       <LogOut className="w-4 h-4 mr-2" />
                       Logout
