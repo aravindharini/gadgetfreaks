@@ -46,6 +46,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import ListingCard from "../components/marketplace/ListingCard";
 import WhatsAppConnect from "../components/support/WhatsAppConnect";
+import BulkImportPlaces from "../components/admin/BulkImportPlaces";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -317,17 +318,7 @@ export default function Profile() {
                       </Button>
                     </Link>
 
-                    {user.role === 'admin' && (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={handleImportGooglePlaces}
-                        disabled={isImporting}
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        {isImporting ? "Importing..." : "Import Places"}
-                      </Button>
-                    )}
+
                     
                     <Button variant="outline" size="sm" onClick={handleLogout}>
                       <LogOut className="w-4 h-4 mr-2" />
@@ -348,6 +339,13 @@ export default function Profile() {
         <div className="mb-8">
           <WhatsAppConnect />
         </div>
+
+        {/* Admin: Bulk Import */}
+        {user.role === 'admin' && (
+          <div className="mb-8">
+            <BulkImportPlaces />
+          </div>
+        )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
