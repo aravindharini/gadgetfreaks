@@ -60,6 +60,7 @@ import Sell from './pages/Sell';
 import SellerDashboard from './pages/SellerDashboard';
 import Wishlist from './pages/Wishlist';
 import Bookings from './pages/Bookings';
+import ServiceProviderDashboard from './pages/ServiceProviderDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -77,6 +78,7 @@ export const PAGES = {
     "SellerDashboard": SellerDashboard,
     "Wishlist": Wishlist,
     "Bookings": Bookings,
+    "ServiceProviderDashboard": ServiceProviderDashboard,
 }
 
 export const pagesConfig = {

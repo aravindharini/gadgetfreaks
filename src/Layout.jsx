@@ -46,6 +46,7 @@ export default function Layout({ children, currentPageName }) {
     { name: "Home", href: createPageUrl("Home"), icon: Home },
     { name: "Browse", href: createPageUrl("Browse"), icon: Search },
     { name: "Sell", href: createPageUrl("Sell"), icon: Plus },
+    { name: "Provider", href: createPageUrl("ServiceProviderDashboard"), icon: Calendar },
     { name: "Bookings", href: createPageUrl("Bookings"), icon: Calendar },
     { name: "Wishlist", href: createPageUrl("Wishlist"), icon: Heart },
     { name: "Messages", href: createPageUrl("Messages"), icon: MessageCircle },
