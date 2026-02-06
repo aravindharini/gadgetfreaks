@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -9,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import ListingCard from "../components/marketplace/ListingCard";
 import CategoryGrid from "../components/marketplace/CategoryGrid";
 import FeaturedSection from "../components/marketplace/FeaturedSection";
+import CustomerRecommendations from "../components/recommendations/CustomerRecommendations";
 
 export default function Home() {
   const [listings, setListings] = useState([]);
@@ -107,6 +107,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FeaturedSection />
         </div>
+      </section>
+
+      {/* AI Recommendations */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <CustomerRecommendations />
       </section>
 
       {/* Recent Listings */}
