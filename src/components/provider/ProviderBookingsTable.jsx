@@ -13,14 +13,6 @@ import {
   Loader2,
   MessageCircle
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import ServiceProviderChat from "@/components/chat/ServiceProviderChat";
 import { format } from "date-fns";
 import { toast } from "react-hot-toast";
 
@@ -28,7 +20,6 @@ export default function ProviderBookingsTable({ onUpdate }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
-  const [selectedBooking, setSelectedBooking] = useState(null);
 
   useEffect(() => {
     loadBookings();
@@ -183,50 +174,36 @@ export default function ProviderBookingsTable({ onUpdate }) {
                     RM {booking.total_price}
                   </span>
 
-                  <div className="flex gap-2">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <MessageCircle className="w-4 h-4 mr-1" />
-                          Chat
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-3xl max-h-[80vh]">
-                        <ServiceProviderChat booking={booking} />
-                      </DialogContent>
-                    </Dialog>
-
-                    {booking.status === "pending" && (
-                      <>
-                        <Button
-                          onClick={() => updateBookingStatus(booking.id, "confirmed")}
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Accept
-                        </Button>
-                        <Button
-                          onClick={() => updateBookingStatus(booking.id, "cancelled")}
-                          variant="outline"
-                          size="sm"
-                          className="text-red-600 hover:bg-red-50"
-                        >
-                          <XCircle className="w-4 h-4 mr-1" />
-                          Decline
-                        </Button>
-                      </>
-                    )}
-
-                    {booking.status === "confirmed" && (
+                  {booking.status === "pending" && (
+                    <div className="flex gap-2">
                       <Button
-                        onClick={() => updateBookingStatus(booking.id, "completed")}
+                        onClick={() => updateBookingStatus(booking.id, "confirmed")}
                         size="sm"
+                        className="bg-green-600 hover:bg-green-700"
                       >
-                        Mark Complete
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        Accept
                       </Button>
-                    )}
-                  </div>
+                      <Button
+                        onClick={() => updateBookingStatus(booking.id, "cancelled")}
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:bg-red-50"
+                      >
+                        <XCircle className="w-4 h-4 mr-1" />
+                        Decline
+                      </Button>
+                    </div>
+                  )}
+
+                  {booking.status === "confirmed" && (
+                    <Button
+                      onClick={() => updateBookingStatus(booking.id, "completed")}
+                      size="sm"
+                    >
+                      Mark Complete
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

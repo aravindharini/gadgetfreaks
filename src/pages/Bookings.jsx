@@ -4,17 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, MapPin, Phone, Mail, FileText, Loader2, CheckCircle, XCircle, CreditCard, MessageCircle } from "lucide-react";
+import { Calendar, Clock, MapPin, Phone, Mail, FileText, Loader2, CheckCircle, XCircle, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "react-hot-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import ServiceProviderChat from "@/components/chat/ServiceProviderChat";
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
@@ -148,19 +140,11 @@ export default function BookingsPage() {
           </div>
         )}
 
-        <div className="pt-3 border-t flex justify-between items-center">
-          <span className="text-xl font-bold text-green-600">RM {booking.total_price}</span>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <MessageCircle className="w-4 h-4 mr-1" />
-                Chat
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-3xl">
-              <ServiceProviderChat booking={booking} />
-            </DialogContent>
-          </Dialog>
+        <div className="pt-3 border-t">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Total Price:</span>
+            <span className="text-xl font-bold text-blue-600">RM {booking.total_price}</span>
+          </div>
         </div>
 
         {isProvider && booking.status === "pending" && (

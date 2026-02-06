@@ -18,8 +18,6 @@ import { toast } from "react-hot-toast";
 import ProviderBookingsTable from "@/components/provider/ProviderBookingsTable";
 import ProviderServiceListings from "@/components/provider/ProviderServiceListings";
 import ProviderEarnings from "@/components/provider/ProviderEarnings";
-import ProviderAnalytics from "@/components/provider/ProviderAnalytics";
-import ProviderInsights from "@/components/provider/ProviderInsights";
 
 export default function ServiceProviderDashboard() {
   const [loading, setLoading] = useState(true);
@@ -156,8 +154,6 @@ export default function ServiceProviderDashboard() {
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="services">My Services</TabsTrigger>
             <TabsTrigger value="earnings">Earnings</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="insights">AI Insights</TabsTrigger>
           </TabsList>
 
           <TabsContent value="bookings">
@@ -170,14 +166,6 @@ export default function ServiceProviderDashboard() {
 
           <TabsContent value="earnings">
             <ProviderEarnings />
-          </TabsContent>
-
-          <TabsContent value="analytics">
-            <ProviderAnalytics />
-          </TabsContent>
-
-          <TabsContent value="insights">
-            <ProviderInsights />
           </TabsContent>
         </Tabs>
       </div>
