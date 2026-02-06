@@ -62,14 +62,28 @@ export default function ChatBot() {
       setConversation(newConversation);
       setMessages(newConversation.messages || []);
 
-      // Subscribe to updates
-      unsubscribeRef.current = base44.agents.subscribeToConversation(
-        newConversation.id,
-        (data) => {
-          setMessages(data.messages);
-          setIsSending(false);
-        }
-      );
+      // Subscribe to updates with error handling
+      try {
+        unsubscribeRef.current = base44.agents.subscribeToConversation(
+          newConversation.id,
+          (data) => {
+            setMessages(data.messages);
+            setIsSending(false);
+          }
+        );
+      } catch (subError) {
+        console.error("Subscription error:", subError);
+        // Fallback to polling if subscription fails
+        const interval = setInterval(async () => {
+          try {
+            const updated = await base44.agents.getConversation(newConversation.id);
+            setMessages(updated.messages || []);
+          } catch (e) {
+            console.error("Polling error:", e);
+          }
+        }, 3000);
+        unsubscribeRef.current = () => clearInterval(interval);
+      }
     } catch (error) {
       console.error("Error initializing chat:", error);
       toast.error(error.message || "Failed to initialize chat. Please try again.");
