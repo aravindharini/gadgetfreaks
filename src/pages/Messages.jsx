@@ -17,6 +17,7 @@ export default function Messages() {
   const [selectedThread, setSelectedThread] = useState(null);
   const [newMessage, setNewMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [showQuickReplies, setShowQuickReplies] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -147,6 +148,21 @@ export default function Messages() {
   const handleThreadSelect = (thread) => {
     setSelectedThread(thread);
     markAsRead(thread);
+    setShowQuickReplies(false);
+  };
+
+  const quickReplies = [
+    "Is this item still available?",
+    "Can we negotiate the price?",
+    "What's your best offer?",
+    "Can I see more photos?",
+    "Where can we meet?",
+    "Is the condition as described?",
+  ];
+
+  const handleQuickReply = (text) => {
+    setNewMessage(text);
+    setShowQuickReplies(false);
   };
 
   if (!user) {
@@ -207,25 +223,34 @@ export default function Messages() {
                     <button
                       key={thread.key}
                       onClick={() => handleThreadSelect(thread)}
-                      className={`w-full p-4 border-b hover:bg-gray-50 transition-colors text-left ${
+                      className={`w-full p-4 border-b hover:bg-gray-50 transition-colors text-left relative ${
                         selectedThread?.key === thread.key ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarFallback>
+                        <Avatar className="w-12 h-12">
+                          <AvatarFallback className={thread.unreadCount > 0 ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"}>
                             {thread.otherUser.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <p className="font-medium text-sm truncate">{thread.otherUser}</p>
-                            {thread.unreadCount > 0 && (
-                              <Badge className="bg-blue-600 text-white">{thread.unreadCount}</Badge>
-                            )}
+                            <p className={`text-sm truncate ${thread.unreadCount > 0 ? 'font-semibold' : 'font-medium'}`}>
+                              {thread.otherUser}
+                            </p>
+                            <div className="flex flex-col items-end gap-1">
+                              <p className="text-xs text-gray-400">
+                                {new Date(thread.lastMessage.created_date).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                              </p>
+                              {thread.unreadCount > 0 && (
+                                <Badge className="bg-blue-600 text-white text-xs px-1.5 py-0">{thread.unreadCount}</Badge>
+                              )}
+                            </div>
                           </div>
-                          <p className="text-xs text-gray-500 truncate">{thread.listingTitle}</p>
-                          <p className="text-xs text-gray-400 truncate mt-1">{thread.lastMessage.content}</p>
+                          <p className="text-xs text-gray-500 truncate mb-1">{thread.listingTitle}</p>
+                          <p className={`text-xs truncate ${thread.unreadCount > 0 ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
+                            {thread.lastMessage.content}
+                          </p>
                         </div>
                       </div>
                     </button>
@@ -268,39 +293,81 @@ export default function Messages() {
 
                 <ScrollArea className="flex-1 p-4">
                   <div className="space-y-4">
-                    {threadMessages.map((msg) => {
-                      const isMe = msg.created_by === user.email;
-                      return (
-                        <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[70%] ${isMe ? 'order-2' : 'order-1'}`}>
-                            <div className={`rounded-2xl px-4 py-2 ${
-                              isMe ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'
-                            }`}>
-                              <p className="text-sm">{msg.content}</p>
+                    {threadMessages.length === 0 ? (
+                      <div className="text-center py-8 text-gray-400">
+                        <MessageCircle className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                        <p className="text-sm">Start the conversation</p>
+                      </div>
+                    ) : (
+                      threadMessages.map((msg) => {
+                        const isMe = msg.created_by === user.email;
+                        return (
+                          <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[70%] ${isMe ? 'order-2' : 'order-1'}`}>
+                              <div className={`rounded-2xl px-4 py-3 ${
+                                isMe ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'
+                              }`}>
+                                <p className="text-sm leading-relaxed">{msg.content}</p>
+                              </div>
+                              <div className={`flex items-center gap-2 mt-1 px-2 ${isMe ? 'justify-end' : 'justify-start'}`}>
+                                <p className="text-xs text-gray-400">
+                                  {new Date(msg.created_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                                {isMe && msg.read && (
+                                  <span className="text-xs text-gray-400">Read</span>
+                                )}
+                              </div>
                             </div>
-                            <p className="text-xs text-gray-400 mt-1 px-2">
-                              {new Date(msg.created_date).toLocaleString()}
-                            </p>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                    )}
                   </div>
                 </ScrollArea>
 
-                <form onSubmit={handleSendMessage} className="p-4 border-t">
-                  <div className="flex gap-2">
-                    <Input
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type a message..."
-                      disabled={isSending}
-                    />
-                    <Button type="submit" disabled={isSending || !newMessage.trim()}>
-                      <Send className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </form>
+                <div className="border-t">
+                  {showQuickReplies && (
+                    <div className="p-4 border-b bg-gray-50">
+                      <p className="text-xs font-medium text-gray-700 mb-2">Quick Replies</p>
+                      <div className="flex flex-wrap gap-2">
+                        {quickReplies.map((reply, idx) => (
+                          <Button
+                            key={idx}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuickReply(reply)}
+                            className="text-xs"
+                          >
+                            {reply}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <form onSubmit={handleSendMessage} className="p-4">
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setShowQuickReplies(!showQuickReplies)}
+                        className="flex-shrink-0"
+                      >
+                        <MessageCircle className="w-5 h-5" />
+                      </Button>
+                      <Input
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        placeholder="Type a message..."
+                        disabled={isSending}
+                        className="flex-1"
+                      />
+                      <Button type="submit" disabled={isSending || !newMessage.trim()} className="flex-shrink-0">
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </form>
+                </div>
               </CardContent>
             ) : (
               <CardContent className="flex items-center justify-center h-full text-gray-400">
