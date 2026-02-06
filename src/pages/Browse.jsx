@@ -272,6 +272,12 @@ export default function Browse() {
               <SelectItem value="restaurant">Restaurants</SelectItem>
               <SelectItem value="cafe">Cafes</SelectItem>
               <SelectItem value="shopping_mall">Shopping Malls</SelectItem>
+              <SelectItem value="spa">Spas & Beauty</SelectItem>
+              <SelectItem value="gym">Gyms & Fitness</SelectItem>
+              <SelectItem value="repair">Repair Services</SelectItem>
+              <SelectItem value="installation">Installation</SelectItem>
+              <SelectItem value="consultation">Consultation</SelectItem>
+              <SelectItem value="other">Other Services</SelectItem>
             </SelectContent>
           </Select>
         </div>
