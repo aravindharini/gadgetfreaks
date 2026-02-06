@@ -44,6 +44,8 @@ export default function ListingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [wishlistId, setWishlistId] = useState(null);
 
   const loadListing = useCallback(async () => {
     try {
@@ -72,6 +74,56 @@ export default function ListingPage() {
   useEffect(() => {
     loadListing();
   }, [loadListing]);
+
+  useEffect(() => {
+    if (listing) {
+      checkWishlistStatus();
+    }
+  }, [listing]);
+
+  const checkWishlistStatus = async () => {
+    try {
+      const user = await User.me();
+      const wishlistItems = await Wishlist.filter({ 
+        created_by: user.email,
+        listing_id: listing.id 
+      });
+      if (wishlistItems.length > 0) {
+        setIsInWishlist(true);
+        setWishlistId(wishlistItems[0].id);
+      }
+    } catch (error) {
+      // User not logged in
+    }
+  };
+
+  const toggleWishlist = async () => {
+    try {
+      const user = await User.me();
+      
+      if (isInWishlist) {
+        await Wishlist.delete(wishlistId);
+        setIsInWishlist(false);
+        setWishlistId(null);
+        toast.success("Removed from wishlist");
+      } else {
+        const wishlistItem = await Wishlist.create({
+          listing_id: listing.id,
+          listing_title: listing.title,
+          original_price: listing.price
+        });
+        setIsInWishlist(true);
+        setWishlistId(wishlistItem.id);
+        toast.success("Added to wishlist");
+      }
+    } catch (error) {
+      if (error.message?.includes("not authenticated")) {
+        toast.error("Please login to add to wishlist");
+      } else {
+        toast.error("Failed to update wishlist");
+      }
+    }
+  };
 
   const addToCart = async () => {
     setAddingToCart(true);
@@ -256,15 +308,20 @@ export default function ListingPage() {
                       // Regular products: Show add to cart
                       <>
                         <Button 
+                          onClick={toggleWishlist}
+                          variant="outline"
+                          size="icon"
+                          className={`h-12 w-12 ${isInWishlist ? "text-red-500 border-red-500" : ""}`}
+                        >
+                          <Heart className={`w-5 h-5 ${isInWishlist ? "fill-current" : ""}`} />
+                        </Button>
+                        <Button 
                           onClick={addToCart}
                           disabled={addingToCart || listing.status !== "active"}
                           className="flex-1 bg-blue-600 hover:bg-blue-700 h-12"
                         >
                           <ShoppingCart className="w-5 h-5 mr-2" />
                           {addingToCart ? "Adding..." : "Add to Cart"}
-                        </Button>
-                        <Button variant="outline" size="icon" className="h-12 w-12">
-                          <Heart className="w-5 h-5" />
                         </Button>
                       </>
                     )}

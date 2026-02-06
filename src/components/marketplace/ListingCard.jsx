@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Cart } from "@/entities/Cart";
+import { Wishlist } from "@/entities/Wishlist";
 import { User } from "@/entities/User";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,59 @@ const conditionColors = {
 
 export default function ListingCard({ listing }) {
   const [addingToCart, setAddingToCart] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [wishlistId, setWishlistId] = useState(null);
   const primaryImage = listing.images?.[0] || "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop";
+
+  useEffect(() => {
+    checkWishlistStatus();
+  }, [listing.id]);
+
+  const checkWishlistStatus = async () => {
+    try {
+      const user = await User.me();
+      const wishlistItems = await Wishlist.filter({ 
+        created_by: user.email,
+        listing_id: listing.id 
+      });
+      if (wishlistItems.length > 0) {
+        setIsInWishlist(true);
+        setWishlistId(wishlistItems[0].id);
+      }
+    } catch (error) {
+      // User not logged in
+    }
+  };
+
+  const toggleWishlist = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const user = await User.me();
+      
+      if (isInWishlist) {
+        await Wishlist.delete(wishlistId);
+        setIsInWishlist(false);
+        setWishlistId(null);
+        toast.success("Removed from wishlist");
+      } else {
+        const wishlistItem = await Wishlist.create({
+          listing_id: listing.id,
+          listing_title: listing.title,
+          original_price: listing.price
+        });
+        setIsInWishlist(true);
+        setWishlistId(wishlistItem.id);
+        toast.success("Added to wishlist");
+      }
+    } catch (error) {
+      if (error.message?.includes("not authenticated")) {
+        toast.error("Please login to add to wishlist");
+      } else {
+        toast.error("Failed to update wishlist");
+      }
+    }
+  };
 
   const addToCart = async (e) => {
     e.preventDefault();
@@ -152,8 +205,13 @@ export default function ListingCard({ listing }) {
                 <ShoppingCart className="w-4 h-4 mr-2" />
                 {addingToCart ? "Adding..." : "Add to Cart"}
               </Button>
-              <Button variant="outline" size="icon" className="flex-shrink-0">
-                <Heart className="w-4 h-4" />
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className={`flex-shrink-0 ${isInWishlist ? "text-red-500 border-red-500" : ""}`}
+                onClick={toggleWishlist}
+              >
+                <Heart className={`w-4 h-4 ${isInWishlist ? "fill-current" : ""}`} />
               </Button>
             </div>
           </>
