@@ -21,8 +21,13 @@ Deno.serve(async (req) => {
         const geocodeRes = await fetch(geocodeUrl);
         const geocodeData = await geocodeRes.json();
 
+        console.log('Geocode response:', geocodeData);
+
         if (geocodeData.status !== 'OK' || !geocodeData.results[0]) {
-            return Response.json({ error: 'Failed to geocode location' }, { status: 400 });
+            return Response.json({ 
+                error: 'Failed to geocode location', 
+                details: geocodeData.error_message || geocodeData.status 
+            }, { status: 400 });
         }
 
         const { lat, lng } = geocodeData.results[0].geometry.location;
