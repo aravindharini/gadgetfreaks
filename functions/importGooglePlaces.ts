@@ -69,9 +69,8 @@ Deno.serve(async (req) => {
                 else if (details.types.includes('restaurant')) serviceType = 'restaurant';
                 else if (details.types.includes('cafe')) serviceType = 'cafe';
                 else if (details.types.includes('shopping_mall') || details.types.includes('shopping_center')) serviceType = 'shopping_mall';
-                else if (details.types.includes('spa') || details.types.includes('beauty_salon')) serviceType = 'other';
-                else if (details.types.includes('gym') || details.types.includes('fitness')) serviceType = 'other';
-                else if (details.types.includes('night_club') || details.types.includes('bar')) serviceType = 'other';
+                else if (details.types.includes('spa') || details.types.includes('beauty_salon')) serviceType = 'spa';
+                else if (details.types.includes('gym') || details.types.includes('fitness')) serviceType = 'gym';
 
                 // Get photo URL if available
                 const photoUrl = details.photos?.[0]?.photo_reference
