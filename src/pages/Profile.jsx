@@ -130,7 +130,7 @@ export default function Profile() {
     try {
       const response = await base44.functions.invoke('importGooglePlaces', {
         location: "Malaysia",
-        types: ["hospital", "doctor", "night_club", "bar", "lodging"]
+        types: ["hospital", "doctor", "night_club", "bar", "lodging", "restaurant", "cafe", "shopping_mall", "spa", "gym"]
       });
 
       if (response.success) {

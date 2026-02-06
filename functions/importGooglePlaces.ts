@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
         }
 
-        const { location = "Kuala Lumpur, Malaysia", types = ["hospital", "doctor", "night_club", "bar", "lodging"] } = await req.json();
+        const { location = "Kuala Lumpur, Malaysia", types = ["hospital", "doctor", "night_club", "bar", "lodging", "restaurant", "cafe", "shopping_mall", "spa", "gym"] } = await req.json();
 
         const apiKey = Deno.env.get("GOOGLE_API_KEY");
         if (!apiKey) {
@@ -52,12 +52,14 @@ Deno.serve(async (req) => {
                 // Map Google type to our service_type
                 let serviceType = 'other';
                 if (details.types.includes('hospital')) serviceType = 'hospital';
-                else if (details.types.includes('doctor') || details.types.includes('health')) serviceType = 'clinic';
+                else if (details.types.includes('doctor') || details.types.includes('health') || details.types.includes('dentist')) serviceType = 'clinic';
                 else if (details.types.includes('lodging') || details.types.includes('hotel')) serviceType = 'hotel';
                 else if (details.types.includes('restaurant')) serviceType = 'restaurant';
                 else if (details.types.includes('cafe')) serviceType = 'cafe';
-                else if (details.types.includes('night_club')) serviceType = 'other';
-                else if (details.types.includes('bar')) serviceType = 'other';
+                else if (details.types.includes('shopping_mall') || details.types.includes('shopping_center')) serviceType = 'shopping_mall';
+                else if (details.types.includes('spa') || details.types.includes('beauty_salon')) serviceType = 'other';
+                else if (details.types.includes('gym') || details.types.includes('fitness')) serviceType = 'other';
+                else if (details.types.includes('night_club') || details.types.includes('bar')) serviceType = 'other';
 
                 // Get photo URL if available
                 const photoUrl = details.photos?.[0]?.photo_reference
