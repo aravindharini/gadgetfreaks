@@ -10,7 +10,7 @@ import {
   Gamepad2,
   Camera,
   Cpu,
-  CalendarClock,
+  Clock,
   Wrench
 } from "lucide-react";
 
@@ -74,7 +74,7 @@ const categories = [
   {
     id: "rentals",
     name: "Rentals",
-    icon: CalendarClock,
+    icon: Clock,
     color: "from-cyan-500 to-cyan-600",
     count: "New"
   },
