@@ -74,10 +74,10 @@ export default function Browse() {
       );
     }
 
-    // Distance filter (for services category)
-    if (selectedCategory === "services" && userLocation) {
+    // Distance filter (for services category) - only filter items that have coordinates
+    if (selectedCategory === "services" && userLocation && distanceRange < 1000) {
       filtered = filtered.filter(item => {
-        if (!item.latitude || !item.longitude) return false;
+        if (!item.latitude || !item.longitude) return true; // Show items without coordinates
         const distance = calculateDistance(
           userLocation.lat, 
           userLocation.lng, 
