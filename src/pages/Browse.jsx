@@ -396,24 +396,28 @@ export default function Browse() {
             <span>1 km</span>
             <span>1000 km (Entire Malaysia)</span>
           </div>
-          {locationStatus === "loading" && (
-            <p className="text-xs text-blue-600 mt-2">📍 Getting your location...</p>
-          )}
-          {locationStatus === "denied" && (
-            <div className="mt-2">
-              <p className="text-xs text-amber-600">⚠️ Location access denied. Using KL city center as default.</p>
-              <button onClick={getUserLocation} className="text-xs text-blue-600 underline mt-1">Try again</button>
-            </div>
-          )}
-          {locationStatus === "granted" && (
-            <p className="text-xs text-green-600 mt-2">✅ Using your current location</p>
-          )}
-          {(locationStatus === "idle" || locationStatus === "default") && (
-            <div className="mt-2">
-              <p className="text-xs text-amber-600">Using default location (KL).</p>
-              <button onClick={getUserLocation} className="text-xs text-blue-600 underline mt-1">Use my location</button>
-            </div>
-          )}
+          <div className="mt-3">
+            {locationStatus === "loading" && (
+              <p className="text-xs text-blue-600">📍 Getting your location...</p>
+            )}
+            {locationStatus === "granted" && (
+              <p className="text-xs text-green-600">✅ Using your current location</p>
+            )}
+            {locationStatus === "denied" && (
+              <p className="text-xs text-amber-600">
+                ⚠️ Location blocked. Please enable it in your browser settings, then{" "}
+                <button onClick={getUserLocation} className="underline font-medium">try again</button>.
+              </p>
+            )}
+            {(locationStatus === "idle" || locationStatus === "default") && (
+              <button
+                onClick={getUserLocation}
+                className="flex items-center gap-1 text-xs text-blue-600 font-medium hover:underline"
+              >
+                📍 Use my current location
+              </button>
+            )}
+          </div>
         </div>
       )}
 
