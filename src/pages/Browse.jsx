@@ -127,7 +127,6 @@ export default function Browse() {
 
   useEffect(() => {
     loadListings();
-    getUserLocation();
     
     // Get URL params
     const urlParams = new URLSearchParams(window.location.search);
@@ -136,6 +135,15 @@ export default function Browse() {
     
     if (category) setSelectedCategory(category);
     if (search) setSearchQuery(search);
+
+    // Check if permission is already granted, silently get location
+    if (navigator.permissions) {
+      navigator.permissions.query({ name: "geolocation" }).then((result) => {
+        if (result.state === "granted") {
+          getUserLocation();
+        }
+      });
+    }
   }, []); // Empty dependency array means this runs once on mount
 
   const getUserLocation = () => {
