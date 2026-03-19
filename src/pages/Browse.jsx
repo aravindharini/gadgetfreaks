@@ -27,6 +27,7 @@ export default function Browse() {
   const [maxPrice, setMaxPrice] = useState(10000);
   const [distanceRange, setDistanceRange] = useState(50); // km
   const [userLocation, setUserLocation] = useState(null);
+  const [locationStatus, setLocationStatus] = useState("idle"); // idle | loading | granted | denied | default
   const [sortBy, setSortBy] = useState("-created_date");
   
   const [availableBrands, setAvailableBrands] = useState([]);
