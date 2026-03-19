@@ -388,10 +388,23 @@ export default function Browse() {
             <span>1 km</span>
             <span>1000 km (Entire Malaysia)</span>
           </div>
-          {!userLocation && (
-            <p className="text-xs text-amber-600 mt-2">
-              Using default location. Enable location access for accurate results.
-            </p>
+          {locationStatus === "loading" && (
+            <p className="text-xs text-blue-600 mt-2">📍 Getting your location...</p>
+          )}
+          {locationStatus === "denied" && (
+            <div className="mt-2">
+              <p className="text-xs text-amber-600">⚠️ Location access denied. Using KL city center as default.</p>
+              <button onClick={getUserLocation} className="text-xs text-blue-600 underline mt-1">Try again</button>
+            </div>
+          )}
+          {locationStatus === "granted" && (
+            <p className="text-xs text-green-600 mt-2">✅ Using your current location</p>
+          )}
+          {(locationStatus === "idle" || locationStatus === "default") && (
+            <div className="mt-2">
+              <p className="text-xs text-amber-600">Using default location (KL).</p>
+              <button onClick={getUserLocation} className="text-xs text-blue-600 underline mt-1">Use my location</button>
+            </div>
           )}
         </div>
       )}
