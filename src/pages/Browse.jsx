@@ -140,22 +140,25 @@ export default function Browse() {
 
   const getUserLocation = () => {
     if (navigator.geolocation) {
+      setLocationStatus("loading");
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
+          setLocationStatus("granted");
         },
         (error) => {
-          console.log("Location access denied or unavailable");
-          // Default to KL city center if location not available
+          console.log("Location access denied or unavailable:", error.message);
           setUserLocation({ lat: 3.1390, lng: 101.6869 });
-        }
+          setLocationStatus("denied");
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } else {
-      // Default to KL city center
       setUserLocation({ lat: 3.1390, lng: 101.6869 });
+      setLocationStatus("default");
     }
   };
 
