@@ -1,0 +1,47 @@
+{
+  "name": "Wishlist",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "description": "ID of the wishlisted listing"
+    },
+    "listing_title": {
+      "type": "string",
+      "description": "Cached listing title"
+    },
+    "original_price": {
+      "type": "number",
+      "description": "Price when added to wishlist"
+    }
+  },
+  "required": [
+    "listing_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "location": {
+      "type": "string",
+      "description": "City, State"
+    },
+    "bio": {
+      "type": "string",
+      "description": "User bio"
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether user is verified"
+    },
+    "rating": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 5,
+      "description": "User rating out of 5"
+    },
+    "total_sales": {
+      "type": "number",
+      "default": 0,
+      "description": "Total number of completed sales"
+    }
+  },
+  "required": [
+    "phone",
+    "location",
+    "bio",
+    "rating"
+  ]
+}

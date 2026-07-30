@@ -1,0 +1,61 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "description": "ID of the listing being discussed"
+    },
+    "recipient_email": {
+      "type": "string",
+      "description": "Email of the message recipient"
+    },
+    "content": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the message has been read"
+    },
+    "listing_title": {
+      "type": "string",
+      "description": "Cached listing title for performance"
+    }
+  },
+  "required": [
+    "listing_id",
+    "recipient_email",
+    "content"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "recipient_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "name": "Booking",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "description": "ID of the service being booked"
+    },
+    "listing_title": {
+      "type": "string",
+      "description": "Cached service title"
+    },
+    "service_provider_email": {
+      "type": "string",
+      "description": "Email of the service provider"
+    },
+    "booking_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the booking"
+    },
+    "booking_time": {
+      "type": "string",
+      "description": "Time slot for the booking"
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duration in minutes",
+      "default": 60
+    },
+    "service_details": {
+      "type": "string",
+      "description": "Specific service requested"
+    },
+    "additional_notes": {
+      "type": "string",
+      "description": "Additional customer notes"
+    },
+    "customer_name": {
+      "type": "string",
+      "description": "Customer full name"
+    },
+    "customer_phone": {
+      "type": "string",
+      "description": "Customer contact phone"
+    },
+    "customer_email": {
+      "type": "string",
+      "description": "Customer email"
+    },
+    "total_price": {
+      "type": "number",
+      "description": "Total booking price in MYR"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "cancelled",
+        "completed"
+      ],
+      "default": "pending",
+      "description": "Booking status"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "unpaid",
+        "paid",
+        "refunded"
+      ],
+      "default": "unpaid",
+      "description": "Payment status"
+    },
+    "payment_intent_id": {
+      "type": "string",
+      "description": "Stripe payment intent ID"
+    }
+  },
+  "required": [
+    "listing_id",
+    "booking_date",
+    "booking_time",
+    "customer_name",
+    "customer_phone",
+    "customer_email",
+    "total_price"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "service_provider_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

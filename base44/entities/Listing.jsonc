@@ -1,0 +1,213 @@
+{
+  "name": "Listing",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Product title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed product description"
+    },
+    "price": {
+      "type": "number",
+      "description": "Listing price in MYR (or Buy Now price for auctions)"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "smartphone",
+        "tablet",
+        "laptop",
+        "smartwatch",
+        "headphones",
+        "gaming",
+        "camera",
+        "accessories",
+        "rentals",
+        "services"
+      ],
+      "description": "Product category"
+    },
+    "service_type": {
+      "type": "string",
+      "enum": [
+        "hospital",
+        "clinic",
+        "hotel",
+        "restaurant",
+        "cafe",
+        "shopping_mall",
+        "repair",
+        "installation",
+        "consultation",
+        "other"
+      ],
+      "description": "Type of service (for services category)"
+    },
+    "services_offered": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of services/menu items offered (for services category)"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Key features or highlights (2-3 main points)"
+    },
+    "brand": {
+      "type": "string",
+      "description": "Product brand"
+    },
+    "model": {
+      "type": "string",
+      "description": "Product model"
+    },
+    "condition": {
+      "type": "string",
+      "enum": [
+        "mint",
+        "excellent",
+        "good",
+        "fair",
+        "poor"
+      ],
+      "description": "Device condition"
+    },
+    "storage": {
+      "type": "string",
+      "description": "Storage capacity (for applicable devices)"
+    },
+    "color": {
+      "type": "string",
+      "description": "Device color"
+    },
+    "carrier": {
+      "type": "string",
+      "description": "Carrier/network (for phones)"
+    },
+    "contact_phone": {
+      "type": "string",
+      "description": "Contact phone number (for services)"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Contact email (for services)"
+    },
+    "website": {
+      "type": "string",
+      "description": "Website URL (for services)"
+    },
+    "address": {
+      "type": "string",
+      "description": "Physical address (for services)"
+    },
+    "operating_hours": {
+      "type": "string",
+      "description": "Business hours (for services)"
+    },
+    "latitude": {
+      "type": "number",
+      "description": "Location latitude (for services)"
+    },
+    "longitude": {
+      "type": "number",
+      "description": "Location longitude (for services)"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Product image URLs"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "sold",
+        "pending",
+        "removed"
+      ],
+      "default": "active",
+      "description": "Listing status"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether listing is featured"
+    },
+    "seller_notes": {
+      "type": "string",
+      "description": "Additional seller notes"
+    },
+    "views": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of times listing has been viewed"
+    },
+    "is_auction": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this is an auction listing"
+    },
+    "starting_bid": {
+      "type": "number",
+      "description": "Starting bid amount for auctions"
+    },
+    "current_bid": {
+      "type": "number",
+      "description": "Current highest bid amount"
+    },
+    "auction_end_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the auction ends"
+    },
+    "bid_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of bids placed"
+    }
+  },
+  "required": [
+    "title",
+    "price",
+    "category",
+    "condition"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "status": "active"
+        },
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

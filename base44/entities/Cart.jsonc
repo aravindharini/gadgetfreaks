@@ -1,0 +1,49 @@
+{
+  "name": "Cart",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "description": "ID of the listing"
+    },
+    "quantity": {
+      "type": "number",
+      "default": 1,
+      "description": "Quantity in cart"
+    },
+    "added_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When item was added to cart"
+    }
+  },
+  "required": [
+    "listing_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "Bid",
+  "type": "object",
+  "properties": {
+    "listing_id": {
+      "type": "string",
+      "description": "ID of the listing being bid on"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Bid amount in MYR"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "outbid",
+        "won",
+        "cancelled"
+      ],
+      "default": "active",
+      "description": "Bid status"
+    },
+    "listing_title": {
+      "type": "string",
+      "description": "Cached listing title"
+    }
+  },
+  "required": [
+    "listing_id",
+    "amount"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
